@@ -1,5 +1,4 @@
 import React, { useState, useMemo } from 'react';
-import { X, Search, UserPlus, CheckCircle, ArrowRight, ArrowLeft, Wrench, ShieldAlert } from 'lucide-react';
 import type { Customer, Tool, Category } from '../../types/database';
 import { getCustomers, getTools, getCategories, addCustomer, createRental } from '../../lib/storageService';
 import { formatDateTime } from '../../lib/dateUtils';
@@ -15,8 +14,7 @@ export const NewRentalModal: React.FC<NewRentalModalProps> = ({
   onClose,
   onSuccess,
 }) => {
-  // Wizard steps: 1 = Customer, 2 = Tool, 3 = Tool Code, 4 = Start & Options, 5 = Confirmation
-  const [step, setStep] = useState<1 | 2 | 3 | 4 | 5>(1);
+  const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
 
   // Data sources
   const [customers, setCustomers] = useState<Customer[]>(() => getCustomers());
@@ -27,10 +25,6 @@ export const NewRentalModal: React.FC<NewRentalModalProps> = ({
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [selectedToolName, setSelectedToolName] = useState<string>('');
   const [selectedTool, setSelectedTool] = useState<Tool | null>(null);
-  const [expectedReturn, setExpectedReturn] = useState<'NONE' | 'TODAY' | 'TOMORROW' | 'CUSTOM'>('NONE');
-  const [customReturnDate, setCustomReturnDate] = useState<string>('');
-  const [depositAmount, setDepositAmount] = useState<string>('');
-  const [rentalNotes, setRentalNotes] = useState<string>('');
 
   // Add New Customer State inside Step 1
   const [isAddingNewCustomer, setIsAddingNewCustomer] = useState(false);
@@ -44,7 +38,7 @@ export const NewRentalModal: React.FC<NewRentalModalProps> = ({
   const [toolSearch, setToolSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
 
-  // Created Rental Result for Confirmation Step 5
+  // Created Rental Result for Confirmation Step
   const [createdRentalInfo, setCreatedRentalInfo] = useState<{
     code: string;
     customerName: string;
@@ -64,7 +58,7 @@ export const NewRentalModal: React.FC<NewRentalModalProps> = ({
     );
   }, [customers, custSearch]);
 
-  // Distinct Tool Types (Grouped by tool name, NO PRICES)
+  // Distinct Tool Types (NO PRICES DISPLAYED)
   const toolTypes = useMemo(() => {
     const map = new Map<string, { name: string; category_id?: string; total: number; available: number }>();
     tools.forEach((t) => {
@@ -132,27 +126,10 @@ export const NewRentalModal: React.FC<NewRentalModalProps> = ({
   const handleStartRentalSubmit = () => {
     if (!selectedCustomer || !selectedTool) return;
 
-    let returnTimestamp: string | null = null;
-    if (expectedReturn === 'TODAY') {
-      const d = new Date();
-      d.setHours(19, 0, 0, 0); // Default 7:00 PM today
-      returnTimestamp = d.toISOString();
-    } else if (expectedReturn === 'TOMORROW') {
-      const d = new Date();
-      d.setDate(d.getDate() + 1);
-      d.setHours(10, 0, 0, 0); // Default 10:00 AM tomorrow
-      returnTimestamp = d.toISOString();
-    } else if (expectedReturn === 'CUSTOM' && customReturnDate) {
-      returnTimestamp = new Date(customReturnDate).toISOString();
-    }
-
     try {
       const rental = createRental({
         customer_id: selectedCustomer.id,
         tool_id: selectedTool.id,
-        expected_return_at: returnTimestamp,
-        deposit_amount: depositAmount ? parseFloat(depositAmount) : 0,
-        notes: rentalNotes,
       });
 
       setCreatedRentalInfo({
@@ -163,537 +140,325 @@ export const NewRentalModal: React.FC<NewRentalModalProps> = ({
         startedAt: rental.started_at,
       });
 
-      setStep(5); // Show Confirmation Step
+      setStep(4); // Show Confirmation Step
     } catch (err: unknown) {
       alert(err instanceof Error ? err.message : 'Error starting rental');
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/75 backdrop-blur-xs overflow-y-auto">
-      <div className="bg-white rounded-3xl max-w-2xl w-full shadow-2xl border-4 border-amber-500 overflow-hidden flex flex-col max-h-[92vh]">
-        {/* Modal Header */}
-        <div className="bg-slate-900 text-white p-4 sm:p-5 flex items-center justify-between border-b-2 border-slate-800">
-          <div>
-            <div className="text-amber-400 text-xs font-black uppercase tracking-widest">
-              STEP {step} OF 5
-            </div>
-            <h2 className="text-xl sm:text-2xl font-black uppercase tracking-tight text-white">
-              {step === 1 && '1. Select Customer'}
-              {step === 2 && '2. Select Tool'}
-              {step === 3 && '3. Select Tool Code'}
-              {step === 4 && '4. Confirm & Start'}
-              {step === 5 && 'Rental Started ✓'}
-            </h2>
-          </div>
+    <div className="fixed inset-0 bg-[#171a18aa] backdrop-blur-[5px] flex items-center justify-center p-[18px] z-50 overflow-y-auto">
+      <div className="w-full max-w-[590px] max-h-[92vh] overflow-y-auto bg-[#fdfcf9] rounded-[20px] shadow-[0_30px_90px_rgba(0,0,0,0.25)] border border-[#ded9d0] flex flex-col">
+        {/* Header */}
+        <div className="p-[20px_22px] border-b border-[#ded9d0] flex justify-between items-center bg-[#fdfcf9] sticky top-0 z-10">
+          <h2 className="m-0 font-['Manrope'] text-[21px] font-extrabold text-[#20221f]">New Rental</h2>
           <button
             onClick={onClose}
             type="button"
-            className="p-2 text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-xl transition-all min-h-[44px] min-w-[44px] flex items-center justify-center"
+            className="border-0 bg-[#ebe9e3] hover:bg-[#ded9d0] rounded-full w-[35px] h-[35px] text-[19px] flex items-center justify-center text-[#20221f]"
           >
-            <X className="w-6 h-6" />
+            ×
           </button>
         </div>
 
-        {/* Modal Body */}
-        <div className="p-4 sm:p-6 overflow-y-auto flex-1 space-y-4">
-          {/* STEP 1: CUSTOMER SELECTION */}
+        {/* Body */}
+        <div className="p-[20px_22px] flex-1 space-y-4">
+          {step < 4 && (
+            <>
+              {/* Step Progress Bar */}
+              <div className="flex gap-[6px] mb-[18px]">
+                <i className={`h-[4px] rounded-[8px] flex-1 ${step >= 1 ? 'bg-[#d35d2f]' : 'bg-[#e3dfd7]'}`} />
+                <i className={`h-[4px] rounded-[8px] flex-1 ${step >= 2 ? 'bg-[#d35d2f]' : 'bg-[#e3dfd7]'}`} />
+                <i className={`h-[4px] rounded-[8px] flex-1 ${step >= 3 ? 'bg-[#d35d2f]' : 'bg-[#e3dfd7]'}`} />
+              </div>
+
+              <div className="text-[10px] text-[#74766f] font-extrabold uppercase tracking-[0.8px]">
+                {step} / 3 · {step === 1 ? 'Customer' : step === 2 ? 'Tool' : 'Machine'}
+              </div>
+            </>
+          )}
+
+          {/* STEP 1: CUSTOMER */}
           {step === 1 && (
-            <div className="space-y-4">
+            <div>
               {!isAddingNewCustomer ? (
                 <>
-                  <div className="flex flex-col sm:flex-row items-stretch gap-2.5">
-                    <div className="relative flex-1">
-                      <Search className="w-5 h-5 absolute left-3.5 top-3.5 text-slate-400" />
-                      <input
-                        type="text"
-                        value={custSearch}
-                        onChange={(e) => setCustSearch(e.target.value)}
-                        placeholder="Search customer by name or phone..."
-                        className="w-full pl-11 pr-4 py-3 rounded-xl border-2 border-slate-300 focus:border-amber-500 text-slate-900 font-bold text-base"
-                      />
-                    </div>
-                    <button
-                      onClick={() => setIsAddingNewCustomer(true)}
-                      type="button"
-                      className="inline-flex items-center justify-center gap-2 px-4 py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl shadow-md min-h-[48px] uppercase text-sm tracking-wide shrink-0"
-                    >
-                      <UserPlus className="w-5 h-5 stroke-[2.5]" />
-                      <span>+ ADD NEW CUSTOMER</span>
-                    </button>
+                  <h3 className="font-['Manrope'] text-[25px] font-extrabold m-[5px_0_17px] text-[#20221f]">
+                    Who is taking the tool?
+                  </h3>
+
+                  <input
+                    className="w-full h-[50px] border border-[#ded9d0] rounded-[11px] px-[13px] outline-hidden bg-white text-base font-medium mb-3"
+                    placeholder="Search name or phone"
+                    value={custSearch}
+                    onChange={(e) => setCustSearch(e.target.value)}
+                  />
+
+                  <div className="space-y-[8px] max-h-[260px] overflow-y-auto pr-1">
+                    {filteredCustomers.map((cust) => (
+                      <button
+                        key={cust.id}
+                        onClick={() => {
+                          setSelectedCustomer(cust);
+                          setStep(2);
+                        }}
+                        type="button"
+                        className="w-full bg-white border border-[#ded9d0] hover:border-[#d35d2f] rounded-[12px] p-[13px] text-left flex justify-between items-center transition-all cursor-pointer"
+                      >
+                        <div>
+                          <b className="text-[14px] text-[#20221f] font-bold block">{cust.name}</b>
+                          <small className="block text-[#74766f] text-[11px] mt-[3px]">
+                            {cust.phone} · {cust.address || 'Local'}
+                          </small>
+                        </div>
+                        <span className="text-[10px] text-[#d35d2f] font-extrabold uppercase">SELECT</span>
+                      </button>
+                    ))}
                   </div>
 
-                  <div className="space-y-2 max-h-80 overflow-y-auto pt-1">
-                    {filteredCustomers.length === 0 ? (
-                      <div className="text-center py-8 text-slate-500 font-bold">
-                        No customer found matching "{custSearch}".
-                        <br />
-                        <button
-                          onClick={() => {
-                            setNewCustName(custSearch);
-                            setIsAddingNewCustomer(true);
-                          }}
-                          className="mt-3 text-amber-600 underline font-black text-base"
-                        >
-                          + Create new customer "{custSearch}"
-                        </button>
-                      </div>
-                    ) : (
-                      filteredCustomers.map((cust) => (
-                        <div
-                          key={cust.id}
-                          onClick={() => {
-                            setSelectedCustomer(cust);
-                            setStep(2);
-                          }}
-                          className={`p-3.5 sm:p-4 rounded-2xl border-2 cursor-pointer transition-all flex items-center justify-between gap-3 ${
-                            selectedCustomer?.id === cust.id
-                              ? 'border-amber-500 bg-amber-50 shadow-md ring-2 ring-amber-200'
-                              : 'border-slate-200 hover:border-slate-400 bg-white'
-                          }`}
-                        >
-                          <div>
-                            <div className="text-lg font-black text-slate-900">{cust.name}</div>
-                            <div className="text-sm font-bold text-slate-600">
-                              📞 {cust.phone} {cust.address ? `• 📍 ${cust.address}` : ''}
-                            </div>
-                          </div>
-                          <button
-                            type="button"
-                            className="px-4 py-2 bg-slate-900 text-white font-bold rounded-xl text-sm min-h-[40px] shrink-0"
-                          >
-                            SELECT
-                          </button>
-                        </div>
-                      ))
-                    )}
-                  </div>
+                  <button
+                    onClick={() => setIsAddingNewCustomer(true)}
+                    type="button"
+                    className="w-full bg-white border border-dashed border-[#d35d2f] rounded-[12px] p-[13px] mt-[12px] text-left text-[#d35d2f] font-extrabold text-sm flex items-center justify-center gap-2 hover:bg-[#fff0e8]"
+                  >
+                    <span>＋ Add New Customer</span>
+                  </button>
                 </>
               ) : (
-                /* Add New Customer Form */
-                <form onSubmit={handleCreateCustomerSubmit} className="space-y-4 bg-slate-50 p-4 sm:p-5 rounded-2xl border-2 border-amber-300">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-black text-slate-900 uppercase">New Customer Details</h3>
-                    <button
-                      type="button"
-                      onClick={() => setIsAddingNewCustomer(false)}
-                      className="text-xs font-bold text-slate-600 underline"
-                    >
-                      Back to Customer List
+                <form onSubmit={handleCreateCustomerSubmit} className="space-y-3 bg-[#f6f3ed] p-4 rounded-[13px] border border-[#ded9d0]">
+                  <div className="flex justify-between items-center mb-2">
+                    <b className="font-['Manrope'] text-lg text-[#20221f]">New Customer Form</b>
+                    <button type="button" onClick={() => setIsAddingNewCustomer(false)} className="text-xs text-[#74766f] underline font-bold">
+                      Back
                     </button>
                   </div>
 
-                  {custError && (
-                    <div className="p-3 bg-red-100 border border-red-400 text-red-900 text-sm font-bold rounded-xl flex items-center gap-2">
-                      <ShieldAlert className="w-5 h-5 shrink-0 text-red-600" />
-                      <span>{custError}</span>
-                    </div>
-                  )}
+                  {custError && <div className="text-xs font-bold text-red-600">{custError}</div>}
 
                   <div>
-                    <label className="block text-xs font-black text-slate-700 uppercase mb-1">Customer Name *</label>
+                    <label className="text-xs font-bold text-[#74766f] block mb-1">Customer Name *</label>
                     <input
-                      type="text"
                       required
+                      className="w-full h-[42px] border border-[#ded9d0] bg-white rounded-[9px] px-3 font-medium text-sm"
                       value={newCustName}
                       onChange={(e) => setNewCustName(e.target.value)}
                       placeholder="e.g. Afsal"
-                      className="w-full px-4 py-3 rounded-xl border-2 border-slate-300 text-slate-900 font-bold text-base"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-black text-slate-700 uppercase mb-1">Phone Number *</label>
+                    <label className="text-xs font-bold text-[#74766f] block mb-1">Phone Number *</label>
                     <input
-                      type="tel"
                       required
+                      type="tel"
+                      className="w-full h-[42px] border border-[#ded9d0] bg-white rounded-[9px] px-3 font-medium text-sm"
                       value={newCustPhone}
                       onChange={(e) => setNewCustPhone(e.target.value)}
                       placeholder="e.g. 9847123456"
-                      className="w-full px-4 py-3 rounded-xl border-2 border-slate-300 text-slate-900 font-bold text-base"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-black text-slate-700 uppercase mb-1">Address / Place</label>
+                    <label className="text-xs font-bold text-[#74766f] block mb-1">Address / Town</label>
                     <input
-                      type="text"
+                      className="w-full h-[42px] border border-[#ded9d0] bg-white rounded-[9px] px-3 font-medium text-sm"
                       value={newCustAddress}
                       onChange={(e) => setNewCustAddress(e.target.value)}
                       placeholder="e.g. Panamaram, Wayanad"
-                      className="w-full px-4 py-3 rounded-xl border-2 border-slate-300 text-slate-900 font-bold text-base"
                     />
                   </div>
 
-                  <div className="flex gap-2 pt-2">
-                    <button
-                      type="submit"
-                      className="flex-1 py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl shadow-md min-h-[48px] uppercase text-base"
-                    >
-                      SAVE & SELECT CUSTOMER
-                    </button>
-                  </div>
+                  <button
+                    type="submit"
+                    className="w-full h-[46px] bg-[#d35d2f] text-white font-extrabold text-sm rounded-[11px] mt-3"
+                  >
+                    Save & Select Customer
+                  </button>
                 </form>
               )}
             </div>
           )}
 
-          {/* STEP 2: TOOL TYPE SELECTION (NO PRICES DISPLAYED) */}
+          {/* STEP 2: TOOL */}
           {step === 2 && (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between bg-amber-50 p-3 rounded-xl border border-amber-300 text-sm font-bold text-slate-900">
-                <span>Selected Customer: <strong>{selectedCustomer?.name}</strong> ({selectedCustomer?.phone})</span>
+            <div>
+              <h3 className="font-['Manrope'] text-[25px] font-extrabold m-[5px_0_17px] text-[#20221f]">
+                What are they taking?
+              </h3>
+
+              {/* Categories pills */}
+              <div className="flex gap-[7px] overflow-x-auto mb-[11px] pb-1 no-scrollbar">
                 <button
-                  onClick={() => setStep(1)}
-                  className="text-xs text-amber-700 font-black underline uppercase"
+                  type="button"
+                  onClick={() => setSelectedCategory('ALL')}
+                  className={`whitespace-nowrap border rounded-[20px] px-[11px] py-[8px] text-[10px] font-extrabold ${
+                    selectedCategory === 'ALL' ? 'bg-[#232621] text-white border-[#232621]' : 'bg-white text-[#20221f] border-[#ded9d0]'
+                  }`}
                 >
-                  Change
+                  All
                 </button>
-              </div>
-
-              {/* Search & Category Filter */}
-              <div className="space-y-2">
-                <div className="relative">
-                  <Search className="w-5 h-5 absolute left-3.5 top-3.5 text-slate-400" />
-                  <input
-                    type="text"
-                    value={toolSearch}
-                    onChange={(e) => setToolSearch(e.target.value)}
-                    placeholder="Search tool (e.g. drill, cutter, washer)..."
-                    className="w-full pl-11 pr-4 py-3 rounded-xl border-2 border-slate-300 focus:border-amber-500 text-slate-900 font-bold text-base"
-                  />
-                </div>
-
-                {/* Category Pills */}
-                <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
+                {categories.map((cat) => (
                   <button
+                    key={cat.id}
                     type="button"
-                    onClick={() => setSelectedCategory('ALL')}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-black uppercase shrink-0 min-h-[36px] ${
-                      selectedCategory === 'ALL'
-                        ? 'bg-slate-900 text-amber-400'
-                        : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
+                    onClick={() => setSelectedCategory(cat.id)}
+                    className={`whitespace-nowrap border rounded-[20px] px-[11px] py-[8px] text-[10px] font-extrabold ${
+                      selectedCategory === cat.id ? 'bg-[#232621] text-white border-[#232621]' : 'bg-white text-[#20221f] border-[#ded9d0]'
                     }`}
                   >
-                    All Categories
+                    {cat.name}
                   </button>
-                  {categories.map((cat) => (
-                    <button
-                      key={cat.id}
-                      type="button"
-                      onClick={() => setSelectedCategory(cat.id)}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-black uppercase shrink-0 min-h-[36px] ${
-                        selectedCategory === cat.id
-                          ? 'bg-slate-900 text-amber-400'
-                          : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
-                      }`}
-                    >
-                      {cat.name}
-                    </button>
-                  ))}
+                ))}
+              </div>
+
+              <input
+                className="w-full h-[50px] border border-[#ded9d0] rounded-[11px] px-[13px] outline-hidden bg-white text-base font-medium mb-3"
+                placeholder="Search tool..."
+                value={toolSearch}
+                onChange={(e) => setToolSearch(e.target.value)}
+              />
+
+              <div className="space-y-[8px] max-h-[260px] overflow-y-auto">
+                {filteredToolTypes.map((tt) => (
+                  <button
+                    key={tt.name}
+                    type="button"
+                    onClick={() => {
+                      setSelectedToolName(tt.name);
+                      setStep(3);
+                    }}
+                    className="w-full bg-white border border-[#ded9d0] hover:border-[#d35d2f] rounded-[12px] p-[13px] text-left flex justify-between items-center transition-all cursor-pointer"
+                  >
+                    <div>
+                      <b className="text-[14px] text-[#20221f] font-bold block">{tt.name}</b>
+                      <small className="block text-[#74766f] text-[11px] mt-[3px]">
+                        {tt.available} available
+                      </small>
+                    </div>
+                    <span className="text-[10px] text-[#d35d2f] font-extrabold uppercase">SELECT</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* STEP 3: MACHINE CODE */}
+          {step === 3 && (
+            <div>
+              <h3 className="font-['Manrope'] text-[25px] font-extrabold m-[5px_0_17px] text-[#20221f]">
+                Choose the machine
+              </h3>
+
+              <div className="bg-[#f1eee8] border border-[#ded9d0] rounded-[12px] p-[13px] mb-[12px] space-y-1">
+                <div className="flex justify-between text-[13px]">
+                  <span className="text-[#74766f]">Customer</span>
+                  <b className="text-[#20221f] font-bold">{selectedCustomer?.name}</b>
+                </div>
+                <div className="flex justify-between text-[13px]">
+                  <span className="text-[#74766f]">Tool</span>
+                  <b className="text-[#20221f] font-bold">{selectedToolName}</b>
                 </div>
               </div>
 
-              {/* Tool List (STRICT NO PRICING RULE) */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-80 overflow-y-auto">
-                {filteredToolTypes.map((tt) => {
-                  const isAvailable = tt.available > 0;
+              <div className="grid grid-cols-2 gap-[8px] max-h-[220px] overflow-y-auto">
+                {availableToolCodes.map((machineItem) => {
+                  const isAvailable = machineItem.status === 'AVAILABLE';
+                  const isSelected = selectedTool?.id === machineItem.id;
+
                   return (
-                    <div
-                      key={tt.name}
-                      onClick={() => {
-                        if (isAvailable) {
-                          setSelectedToolName(tt.name);
-                          setStep(3);
-                        }
-                      }}
-                      className={`p-4 rounded-2xl border-2 transition-all flex items-center justify-between ${
-                        isAvailable
-                          ? 'border-slate-300 hover:border-amber-500 bg-white cursor-pointer hover:shadow-md'
-                          : 'border-slate-200 bg-slate-100 opacity-60 cursor-not-allowed'
+                    <button
+                      key={machineItem.id}
+                      type="button"
+                      disabled={!isAvailable}
+                      onClick={() => setSelectedTool(machineItem)}
+                      className={`bg-white border rounded-[12px] p-[13px] text-left transition-all ${
+                        !isAvailable
+                          ? 'opacity-40 cursor-not-allowed border-[#ded9d0]'
+                          : isSelected
+                          ? 'border-[#d35d2f] bg-[#fff0e8] ring-2 ring-[#f2a36f]'
+                          : 'border-[#ded9d0] hover:border-[#d35d2f] cursor-pointer'
                       }`}
                     >
                       <div>
-                        <div className="text-lg font-black text-slate-900">{tt.name}</div>
-                        <div className="text-xs font-bold text-slate-500">
-                          {tt.available} of {tt.total} available inside shop
-                        </div>
+                        <b className="text-[14px] text-[#20221f] block font-mono font-extrabold">
+                          {machineItem.tool_code}
+                        </b>
+                        <small className="block text-[#74766f] text-[11px] mt-[3px]">
+                          {machineItem.status}
+                        </small>
                       </div>
-
-                      <span
-                        className={`px-3 py-1 text-xs font-bold rounded-lg ${
-                          isAvailable
-                            ? 'bg-emerald-100 text-emerald-900 border border-emerald-300'
-                            : 'bg-amber-100 text-amber-900 border border-amber-300'
-                        }`}
-                      >
-                        {isAvailable ? 'AVAILABLE' : 'ALL OUT'}
-                      </span>
-                    </div>
+                    </button>
                   );
                 })}
               </div>
-            </div>
-          )}
 
-          {/* STEP 3: PHYSICAL TOOL CODE SELECTION */}
-          {step === 3 && (
-            <div className="space-y-4">
-              <div className="bg-amber-50 p-3 rounded-xl border border-amber-300 text-sm font-bold text-slate-900 space-y-1">
-                <div>Customer: <strong>{selectedCustomer?.name}</strong></div>
-                <div>Tool Type: <strong>{selectedToolName}</strong></div>
-              </div>
-
-              <h3 className="text-lg font-black text-slate-900 uppercase">
-                Select Specific Machine Code ({selectedToolName})
-              </h3>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-80 overflow-y-auto">
-                {availableToolCodes.map((tool) => {
-                  const isAvailable = tool.status === 'AVAILABLE';
-                  const isSelected = selectedTool?.id === tool.id;
-
-                  return (
-                    <div
-                      key={tool.id}
-                      onClick={() => {
-                        if (isAvailable) {
-                          setSelectedTool(tool);
-                          setStep(4);
-                        }
-                      }}
-                      className={`p-4 rounded-2xl border-3 transition-all flex items-center justify-between ${
-                        isSelected
-                          ? 'border-amber-500 bg-amber-100 shadow-md ring-2 ring-amber-300'
-                          : isAvailable
-                          ? 'border-slate-300 hover:border-amber-400 bg-white cursor-pointer'
-                          : 'border-slate-200 bg-slate-100 opacity-50 cursor-not-allowed'
-                      }`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-slate-900 text-amber-400 font-mono font-black flex items-center justify-center text-base shrink-0">
-                          {tool.tool_code}
-                        </div>
-                        <div>
-                          <div className="text-base font-black text-slate-900">{tool.tool_code}</div>
-                          <div className="text-xs font-bold text-slate-500">Condition: {tool.condition}</div>
-                        </div>
-                      </div>
-
-                      <span
-                        className={`px-3 py-1 text-xs font-black rounded-lg border ${
-                          isAvailable
-                            ? 'bg-emerald-100 text-emerald-900 border-emerald-300'
-                            : tool.status === 'RENTED'
-                            ? 'bg-amber-100 text-amber-900 border-amber-300'
-                            : 'bg-blue-100 text-blue-900 border-blue-300'
-                        }`}
-                      >
-                        {tool.status}
-                      </span>
-                    </div>
-                  );
-                })}
+              <div className="flex gap-[8px] mt-[16px]">
+                <button
+                  type="button"
+                  onClick={() => setStep(2)}
+                  className="flex-1 h-[49px] border border-[#ded9d0] bg-white rounded-[11px] font-bold text-sm text-[#20221f]"
+                >
+                  Back
+                </button>
+                <button
+                  type="button"
+                  disabled={!selectedTool}
+                  onClick={handleStartRentalSubmit}
+                  className="flex-1 h-[49px] border-0 bg-[#d35d2f] disabled:opacity-50 text-white rounded-[11px] font-extrabold text-sm shadow-[0_7px_20px_#d35d2f2b]"
+                >
+                  Start Rental
+                </button>
               </div>
             </div>
           )}
 
-          {/* STEP 4: CONFIRM & START RENTAL */}
-          {step === 4 && (
-            <div className="space-y-4">
-              <div className="bg-slate-900 text-white p-4 rounded-2xl border-2 border-amber-500 space-y-2">
-                <div className="text-xs font-black text-amber-400 uppercase tracking-widest">
-                  SUMMARY
+          {/* STEP 4: SUCCESS CONFIRMATION */}
+          {step === 4 && createdRentalInfo && (
+            <div className="text-center py-[30px] px-[20px]">
+              <div className="w-[60px] h-[60px] rounded-full bg-[#e8f5ee] text-[#2f8a61] grid place-items-center mx-auto mb-[14px] text-[29px] font-extrabold">
+                ✓
+              </div>
+              <h2 className="margin-0 font-['Manrope'] text-[25px] font-extrabold text-[#20221f]">
+                Rental Started
+              </h2>
+              <p className="text-[#74766f] text-[12px] mt-1">
+                The digital record has been created.
+              </p>
+
+              <div className="bg-[#f1eee8] border border-[#ded9d0] rounded-[12px] p-[13px] my-[16px] space-y-1 text-left max-w-sm mx-auto">
+                <div className="flex justify-between text-[13px]">
+                  <span className="text-[#74766f]">Customer</span>
+                  <b className="text-[#20221f]">{createdRentalInfo.customerName}</b>
                 </div>
-                <div className="grid grid-cols-2 gap-2 text-base">
-                  <div>
-                    <span className="text-slate-400 text-xs block">Customer:</span>
-                    <strong className="text-lg">{selectedCustomer?.name}</strong>
-                  </div>
-                  <div>
-                    <span className="text-slate-400 text-xs block">Tool:</span>
-                    <strong className="text-lg">{selectedTool?.name} ({selectedTool?.tool_code})</strong>
-                  </div>
+                <div className="flex justify-between text-[13px]">
+                  <span className="text-[#74766f]">Tool</span>
+                  <b className="text-[#20221f]">{createdRentalInfo.toolName}</b>
+                </div>
+                <div className="flex justify-between text-[13px]">
+                  <span className="text-[#74766f]">Machine</span>
+                  <b className="text-[#d35d2f] font-mono">{createdRentalInfo.toolCode}</b>
+                </div>
+                <div className="flex justify-between text-[13px]">
+                  <span className="text-[#74766f]">Started</span>
+                  <b className="text-[#20221f]">{formatDateTime(createdRentalInfo.startedAt)}</b>
                 </div>
               </div>
 
-              {/* Optional Return Date */}
-              <div>
-                <label className="block text-sm font-black text-slate-800 uppercase mb-1">
-                  Expected Return (Optional)
-                </label>
-                <div className="grid grid-cols-3 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setExpectedReturn('NONE')}
-                    className={`py-2.5 px-3 rounded-xl font-bold text-sm border-2 ${
-                      expectedReturn === 'NONE'
-                        ? 'bg-slate-900 text-amber-400 border-slate-900'
-                        : 'bg-slate-100 text-slate-700 border-slate-300'
-                    }`}
-                  >
-                    No Fixed Date
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setExpectedReturn('TODAY')}
-                    className={`py-2.5 px-3 rounded-xl font-bold text-sm border-2 ${
-                      expectedReturn === 'TODAY'
-                        ? 'bg-slate-900 text-amber-400 border-slate-900'
-                        : 'bg-slate-100 text-slate-700 border-slate-300'
-                    }`}
-                  >
-                    Today Evening
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setExpectedReturn('TOMORROW')}
-                    className={`py-2.5 px-3 rounded-xl font-bold text-sm border-2 ${
-                      expectedReturn === 'TOMORROW'
-                        ? 'bg-slate-900 text-amber-400 border-slate-900'
-                        : 'bg-slate-100 text-slate-700 border-slate-300'
-                    }`}
-                  >
-                    Tomorrow AM
-                  </button>
-                </div>
-
-                {expectedReturn === 'CUSTOM' && (
-                  <input
-                    type="datetime-local"
-                    value={customReturnDate}
-                    onChange={(e) => setCustomReturnDate(e.target.value)}
-                    className="mt-2 w-full p-3 rounded-xl border-2 border-slate-300 font-bold"
-                  />
-                )}
+              <div className="flex gap-[8px] mt-[16px] max-w-sm mx-auto">
+                <button
+                  type="button"
+                  onClick={() => {
+                    onSuccess();
+                    onClose();
+                  }}
+                  className="w-full h-[49px] border-0 bg-[#d35d2f] text-white rounded-[11px] font-extrabold text-sm"
+                >
+                  Done
+                </button>
               </div>
-
-              {/* Optional Deposit */}
-              <div>
-                <label className="block text-sm font-black text-slate-800 uppercase mb-1">
-                  Deposit Taken (Optional)
-                </label>
-                <div className="relative">
-                  <span className="absolute left-3.5 top-3 font-black text-slate-500">₹</span>
-                  <input
-                    type="number"
-                    value={depositAmount}
-                    onChange={(e) => setDepositAmount(e.target.value)}
-                    placeholder="0"
-                    className="w-full pl-8 pr-4 py-3 rounded-xl border-2 border-slate-300 font-black text-lg text-slate-900"
-                  />
-                </div>
-              </div>
-
-              {/* Notes */}
-              <div>
-                <label className="block text-sm font-black text-slate-800 uppercase mb-1">
-                  Rental Notes (Optional)
-                </label>
-                <input
-                  type="text"
-                  value={rentalNotes}
-                  onChange={(e) => setRentalNotes(e.target.value)}
-                  placeholder="e.g. Taken with 2 extra drill bits"
-                  className="w-full px-4 py-3 rounded-xl border-2 border-slate-300 font-bold text-base text-slate-900"
-                />
-              </div>
-
-              {/* START RENTAL BUTTON */}
-              <button
-                type="button"
-                onClick={handleStartRentalSubmit}
-                className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xl rounded-2xl shadow-xl hover:shadow-2xl active:scale-98 transition-all border-2 border-amber-300 uppercase tracking-wide min-h-[56px]"
-              >
-                <Wrench className="w-7 h-7 stroke-[2.5]" />
-                <span>START RENTAL NOW</span>
-              </button>
-            </div>
-          )}
-
-          {/* STEP 5: CONFIRMATION SUCCESS SCREEN */}
-          {step === 5 && createdRentalInfo && (
-            <div className="text-center py-6 space-y-6">
-              <div className="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full mx-auto flex items-center justify-center shadow-lg border-4 border-emerald-400">
-                <CheckCircle className="w-12 h-12 stroke-[2.5]" />
-              </div>
-
-              <h3 className="text-3xl font-black text-slate-900 uppercase">
-                RENTAL STARTED ✓
-              </h3>
-
-              <div className="bg-slate-50 p-5 rounded-2xl border-2 border-slate-200 text-left max-w-md mx-auto space-y-2.5 font-bold">
-                <div className="flex justify-between border-b pb-2">
-                  <span className="text-slate-500 text-sm">Rental Code:</span>
-                  <span className="text-amber-600 font-mono text-lg">{createdRentalInfo.code}</span>
-                </div>
-                <div className="flex justify-between border-b pb-2">
-                  <span className="text-slate-500 text-sm">Customer:</span>
-                  <span className="text-slate-900 text-lg">{createdRentalInfo.customerName}</span>
-                </div>
-                <div className="flex justify-between border-b pb-2">
-                  <span className="text-slate-500 text-sm">Tool & Code:</span>
-                  <span className="text-slate-900 text-lg">{createdRentalInfo.toolName} ({createdRentalInfo.toolCode})</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-500 text-sm">Started At:</span>
-                  <span className="text-slate-900 text-sm">{formatDateTime(createdRentalInfo.startedAt)}</span>
-                </div>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => {
-                  onSuccess();
-                  onClose();
-                }}
-                className="w-full max-w-md mx-auto py-4 bg-slate-900 hover:bg-slate-800 text-white font-black text-xl rounded-2xl shadow-xl min-h-[52px] uppercase"
-              >
-                DONE (RETURN TO DASHBOARD)
-              </button>
             </div>
           )}
         </div>
-
-        {/* Modal Footer Navigation */}
-        {step < 5 && (
-          <div className="bg-slate-100 p-4 border-t-2 border-slate-200 flex items-center justify-between">
-            {step > 1 ? (
-              <button
-                onClick={() => setStep((s) => (s - 1) as 1 | 2 | 3 | 4)}
-                type="button"
-                className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold rounded-xl text-sm min-h-[44px]"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                <span>Back</span>
-              </button>
-            ) : (
-              <div />
-            )}
-
-            {step === 1 && selectedCustomer && (
-              <button
-                onClick={() => setStep(2)}
-                type="button"
-                className="inline-flex items-center gap-1.5 px-5 py-2.5 bg-amber-500 text-slate-950 font-black rounded-xl text-sm min-h-[44px]"
-              >
-                <span>Next: Select Tool</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            )}
-
-            {step === 2 && selectedToolName && (
-              <button
-                onClick={() => setStep(3)}
-                type="button"
-                className="inline-flex items-center gap-1.5 px-5 py-2.5 bg-amber-500 text-slate-950 font-black rounded-xl text-sm min-h-[44px]"
-              >
-                <span>Next: Select Tool Code</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            )}
-          </div>
-        )}
       </div>
     </div>
   );

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Search, Users, UserPlus, Phone, ChevronRight } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import type { Customer, Rental } from '../types/database';
 import { getCustomers, getRentals, subscribeToStore } from '../lib/storageService';
 import { CustomerProfileModal } from '../components/customers/CustomerProfileModal';
@@ -35,46 +35,42 @@ export const CustomersPage: React.FC<CustomersPageProps> = ({ onOpenReceipt }) =
 
   return (
     <div className="space-y-6">
-      {/* Top Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#ded9d0] pb-4">
         <div>
-          <div className="inline-flex items-center gap-2 text-amber-600 font-black text-sm uppercase tracking-wider">
-            <Users className="w-5 h-5 stroke-[2.5]" />
-            <span>Customer Directory</span>
-          </div>
-          <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight mt-0.5">
-            Customers ({customers.length})
-          </h2>
+          <h1 className="font-['Manrope'] text-[24px] sm:text-[29px] font-extrabold text-[#20221f] m-0">
+            Customer Directory
+          </h1>
+          <p className="text-[#74766f] text-[13px] mt-1 font-medium">
+            {customers.length} customers registered in shop ledger.
+          </p>
         </div>
 
         <button
           onClick={() => setIsAddModalOpen(true)}
           type="button"
-          className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-base rounded-xl shadow-md min-h-[48px] uppercase tracking-wide shrink-0 border-2 border-amber-300"
+          className="inline-flex items-center justify-center gap-2 h-[44px] bg-[#d35d2f] hover:bg-[#c25227] text-white font-extrabold text-xs rounded-[11px] px-[16px] uppercase shadow-xs border-0"
         >
-          <UserPlus className="w-5 h-5 stroke-[2.5]" />
-          <span>+ ADD CUSTOMER</span>
+          <Plus className="w-4 h-4 stroke-[2.5]" />
+          <span>＋ Add Customer</span>
         </button>
       </div>
 
       {/* Search Input */}
-      <div className="relative">
-        <Search className="w-5 h-5 absolute left-3.5 top-3.5 text-slate-400" />
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Search customer by name, phone number, or town..."
-          className="w-full pl-11 pr-4 py-3 bg-white border-2 border-slate-300 rounded-xl font-bold text-slate-900 focus:border-amber-500 outline-hidden shadow-xs text-base"
-        />
-      </div>
+      <input
+        type="text"
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+        placeholder="Search customer by name, phone number, or town..."
+        className="w-full h-[46px] bg-white border border-[#ded9d0] rounded-[11px] px-[13px] font-medium text-sm outline-hidden shadow-xs"
+      />
 
-      {/* Customers List Grid */}
+      {/* List Grid */}
       {filteredCustomers.length === 0 ? (
         <EmptyState
           title="No customers found"
-          description={searchQuery ? `No customer matches "${searchQuery}"` : 'Add your first shop customer to start recording tool rentals.'}
-          actionLabel="+ ADD NEW CUSTOMER"
+          description={searchQuery ? `No customer matches "${searchQuery}"` : 'Add your first shop customer.'}
+          actionLabel="＋ Add Customer"
           onAction={() => setIsAddModalOpen(true)}
         />
       ) : (
@@ -87,51 +83,47 @@ export const CustomersPage: React.FC<CustomersPageProps> = ({ onOpenReceipt }) =
             return (
               <div
                 key={cust.id}
-                className="bg-white rounded-2xl p-4 sm:p-5 border-2 border-slate-200 shadow-xs hover:shadow-md transition-all flex flex-col justify-between space-y-4"
+                className="bg-[#fdfcf9] border border-[#ded9d0] rounded-[18px] p-[18px] shadow-[0_14px_40px_rgba(43,37,28,0.09)] space-y-4 flex flex-col justify-between"
               >
-                {/* Header */}
-                <div className="flex items-start justify-between gap-3">
+                <div className="flex justify-between items-start gap-3 border-b border-[#efede8] pb-3">
                   <div>
-                    <h3 className="text-xl font-black text-slate-900">{cust.name}</h3>
-                    <div className="text-sm font-bold text-slate-600">📞 {cust.phone}</div>
-                    {cust.address && <div className="text-sm font-bold text-slate-500">📍 {cust.address}</div>}
+                    <h3 className="font-['Manrope'] text-[18px] font-extrabold text-[#20221f] m-0">
+                      {cust.name}
+                    </h3>
+                    <small className="text-[#74766f] text-[11px] font-bold block mt-0.5">
+                      📞 {cust.phone} {cust.address ? `· 📍 ${cust.address}` : ''}
+                    </small>
                   </div>
 
                   <a
                     href={`tel:${cust.phone}`}
-                    className="p-2.5 bg-emerald-100 text-emerald-900 hover:bg-emerald-200 rounded-xl border border-emerald-300 transition-all shrink-0 flex items-center gap-1 text-xs font-black uppercase"
+                    className="border border-[#ded9d0] bg-white hover:bg-[#f6f3ed] text-[#20221f] rounded-[9px] px-[10px] py-[6px] font-bold text-xs"
                   >
-                    <Phone className="w-4 h-4 text-emerald-700 stroke-[2.5]" />
-                    <span className="hidden sm:inline">CALL</span>
+                    ☎ Call
                   </a>
                 </div>
 
-                {/* Rental Counters */}
-                <div className="grid grid-cols-3 gap-2 bg-slate-50 p-2.5 rounded-xl border border-slate-200 text-center font-bold text-xs">
+                <div className="grid grid-cols-3 gap-2 bg-[#f6f3ed] p-2.5 rounded-[12px] border border-[#ded9d0] text-center font-bold text-xs">
                   <div>
-                    <span className="text-slate-500 block uppercase">Total</span>
-                    <span className="text-lg font-black text-slate-900">{custRentals.length}</span>
+                    <span className="text-[#74766f] text-[9px] uppercase block font-extrabold">Total</span>
+                    <span className="text-base font-extrabold text-[#20221f]">{custRentals.length}</span>
                   </div>
                   <div>
-                    <span className="text-slate-500 block uppercase">Active</span>
-                    <span className={`text-lg font-black ${activeCount > 0 ? 'text-amber-600' : 'text-slate-900'}`}>
-                      {activeCount}
-                    </span>
+                    <span className="text-[#74766f] text-[9px] uppercase block font-extrabold">Active</span>
+                    <span className="text-base font-extrabold text-[#d35d2f]">{activeCount}</span>
                   </div>
                   <div>
-                    <span className="text-slate-500 block uppercase">Completed</span>
-                    <span className="text-lg font-black text-emerald-700">{completedCount}</span>
+                    <span className="text-[#74766f] text-[9px] uppercase block font-extrabold">Completed</span>
+                    <span className="text-base font-extrabold text-[#2f8a61]">{completedCount}</span>
                   </div>
                 </div>
 
-                {/* View Profile Action */}
                 <button
                   onClick={() => setSelectedCustomer(cust)}
                   type="button"
-                  className="w-full flex items-center justify-center gap-2 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-sm rounded-xl transition-all min-h-[44px] uppercase tracking-wide"
+                  className="w-full h-[40px] bg-[#232621] hover:bg-[#353a34] text-white font-extrabold text-xs rounded-[10px] transition-all uppercase"
                 >
-                  <span>VIEW CUSTOMER HISTORY</span>
-                  <ChevronRight className="w-4 h-4 text-amber-400" />
+                  View Customer History →
                 </button>
               </div>
             );
@@ -139,7 +131,7 @@ export const CustomersPage: React.FC<CustomersPageProps> = ({ onOpenReceipt }) =
         </div>
       )}
 
-      {/* Profile Modal */}
+      {/* Modals */}
       <CustomerProfileModal
         customer={selectedCustomer}
         isOpen={Boolean(selectedCustomer)}
@@ -147,13 +139,10 @@ export const CustomersPage: React.FC<CustomersPageProps> = ({ onOpenReceipt }) =
         onOpenReceipt={onOpenReceipt}
       />
 
-      {/* Add Customer Modal */}
       <AddCustomerModal
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
-        onSuccess={(created) => {
-          setSelectedCustomer(created);
-        }}
+        onSuccess={(created) => setSelectedCustomer(created)}
       />
     </div>
   );

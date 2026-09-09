@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Search, Wrench, PlusCircle } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import type { Tool, Category, Rental } from '../types/database';
 import { getTools, getCategories, subscribeToStore } from '../lib/storageService';
 import { AddToolModal } from '../components/tools/AddToolModal';
@@ -61,7 +61,6 @@ export const ToolsPage: React.FC<ToolsPageProps> = ({ onReturnTool }) => {
     return Array.from(map.values());
   }, [tools]);
 
-  // Filtered Grouped Tools
   const filteredGroupedTools = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
     return groupedTools.filter((group) => {
@@ -77,49 +76,42 @@ export const ToolsPage: React.FC<ToolsPageProps> = ({ onReturnTool }) => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#ded9d0] pb-4">
         <div>
-          <div className="inline-flex items-center gap-2 text-amber-600 font-black text-sm uppercase tracking-wider">
-            <Wrench className="w-5 h-5 stroke-[2.5]" />
-            <span>Shop Equipment Catalog</span>
-          </div>
-          <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight mt-0.5">
-            Tools Inventory ({tools.length} Machines)
-          </h2>
+          <h1 className="font-['Manrope'] text-[24px] sm:text-[29px] font-extrabold text-[#20221f] m-0">
+            Tools Inventory
+          </h1>
+          <p className="text-[#74766f] text-[13px] mt-1 font-medium">
+            {tools.length} machines tracked in catalog.
+          </p>
         </div>
 
         <button
           onClick={() => setIsAddModalOpen(true)}
           type="button"
-          className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-base rounded-xl shadow-md min-h-[48px] uppercase tracking-wide shrink-0 border-2 border-amber-300"
+          className="inline-flex items-center justify-center gap-2 h-[44px] bg-[#d35d2f] hover:bg-[#c25227] text-white font-extrabold text-xs rounded-[11px] px-[16px] uppercase shadow-xs border-0"
         >
-          <PlusCircle className="w-5 h-5 stroke-[2.5]" />
-          <span>+ ADD NEW TOOL</span>
+          <Plus className="w-4 h-4 stroke-[2.5]" />
+          <span>＋ Add New Tool</span>
         </button>
       </div>
 
-      {/* Search & Category Bar */}
+      {/* Search & Categories */}
       <div className="space-y-3">
-        <div className="relative">
-          <Search className="w-5 h-5 absolute left-3.5 top-3.5 text-slate-400" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search tool by name or machine code (e.g. DR-04)..."
-            className="w-full pl-11 pr-4 py-3 bg-white border-2 border-slate-300 rounded-xl font-bold text-slate-900 focus:border-amber-500 outline-hidden shadow-xs text-base"
-          />
-        </div>
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="Search tool by name or machine code (e.g. DR-04)..."
+          className="w-full h-[46px] bg-white border border-[#ded9d0] rounded-[11px] px-[13px] font-medium text-sm outline-hidden shadow-xs"
+        />
 
-        {/* Categories Pills */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
+        <div className="flex items-center gap-[7px] overflow-x-auto pb-1 no-scrollbar">
           <button
             type="button"
             onClick={() => setSelectedCategory('ALL')}
-            className={`px-4 py-2 rounded-xl text-xs font-black uppercase shrink-0 min-h-[40px] ${
-              selectedCategory === 'ALL'
-                ? 'bg-slate-900 text-amber-400 shadow-md'
-                : 'bg-white text-slate-700 hover:bg-slate-200 border border-slate-300'
+            className={`whitespace-nowrap border rounded-[20px] px-[12px] py-[7px] text-[10px] font-extrabold ${
+              selectedCategory === 'ALL' ? 'bg-[#232621] text-white border-[#232621]' : 'bg-white text-[#20221f] border-[#ded9d0]'
             }`}
           >
             All Categories
@@ -129,10 +121,8 @@ export const ToolsPage: React.FC<ToolsPageProps> = ({ onReturnTool }) => {
               key={cat.id}
               type="button"
               onClick={() => setSelectedCategory(cat.id)}
-              className={`px-4 py-2 rounded-xl text-xs font-black uppercase shrink-0 min-h-[40px] ${
-                selectedCategory === cat.id
-                  ? 'bg-slate-900 text-amber-400 shadow-md'
-                  : 'bg-white text-slate-700 hover:bg-slate-200 border border-slate-300'
+              className={`whitespace-nowrap border rounded-[20px] px-[12px] py-[7px] text-[10px] font-extrabold ${
+                selectedCategory === cat.id ? 'bg-[#232621] text-white border-[#232621]' : 'bg-white text-[#20221f] border-[#ded9d0]'
               }`}
             >
               {cat.name}
@@ -141,12 +131,12 @@ export const ToolsPage: React.FC<ToolsPageProps> = ({ onReturnTool }) => {
         </div>
       </div>
 
-      {/* Grouped Tool Catalog Cards */}
+      {/* Grouped Catalog Grid */}
       {filteredGroupedTools.length === 0 ? (
         <EmptyState
           title="No tools found"
-          description={searchQuery ? `No match found for "${searchQuery}"` : 'Add physical tools to your shop catalog to start renting.'}
-          actionLabel="+ ADD NEW TOOL"
+          description={searchQuery ? `No match found for "${searchQuery}"` : 'Add physical tools to your shop catalog.'}
+          actionLabel="＋ Add New Tool"
           onAction={() => setIsAddModalOpen(true)}
         />
       ) : (
@@ -154,45 +144,48 @@ export const ToolsPage: React.FC<ToolsPageProps> = ({ onReturnTool }) => {
           {filteredGroupedTools.map((group) => (
             <div
               key={group.name}
-              className="bg-white rounded-2xl p-4 sm:p-5 border-2 border-slate-200 shadow-xs space-y-4"
+              className="bg-[#fdfcf9] border border-[#ded9d0] rounded-[18px] p-[18px] shadow-[0_14px_40px_rgba(43,37,28,0.09)] space-y-4"
             >
-              {/* Tool Header (NO PRICES DISPLAYED AS REQUIRED) */}
-              <div className="flex items-start justify-between gap-3 border-b pb-3">
+              {/* Tool Name (NO PRICES SHOWN) */}
+              <div className="flex justify-between items-start border-b border-[#efede8] pb-3">
                 <div>
-                  <h3 className="text-xl font-black text-slate-900 uppercase">{group.name}</h3>
-                  <span className="text-xs font-bold text-slate-500">
-                    {group.category_name || 'General Tools'}
-                  </span>
+                  <h3 className="font-['Manrope'] text-[18px] font-extrabold text-[#20221f] m-0">
+                    {group.name}
+                  </h3>
+                  <small className="text-[#74766f] text-[11px] font-bold block mt-0.5">
+                    {group.category_name || 'General Equipment'}
+                  </small>
                 </div>
 
                 <div className="text-right">
-                  <div className="text-2xl font-black text-slate-900">
-                    {group.items.length} <span className="text-xs text-slate-500 font-bold uppercase">Total</span>
-                  </div>
+                  <b className="font-['Manrope'] text-[22px] font-extrabold text-[#20221f]">
+                    {group.items.length}
+                  </b>
+                  <small className="block text-[#74766f] text-[10px] font-bold">total machines</small>
                 </div>
               </div>
 
-              {/* Counters */}
-              <div className="grid grid-cols-3 gap-2 bg-slate-50 p-2.5 rounded-xl border border-slate-200 text-center font-bold text-xs">
-                <div className="bg-emerald-50 p-1.5 rounded-lg border border-emerald-200">
-                  <span className="text-emerald-800 block uppercase font-black">Available</span>
-                  <span className="text-xl font-black text-emerald-700">{group.availableCount}</span>
+              {/* Status Counters */}
+              <div className="grid grid-cols-3 gap-2 bg-[#f6f3ed] p-2.5 rounded-[12px] border border-[#ded9d0] text-center font-bold text-xs">
+                <div>
+                  <span className="text-[#74766f] text-[9px] uppercase block font-extrabold">Available</span>
+                  <span className="text-base font-extrabold text-[#2f8a61]">{group.availableCount}</span>
                 </div>
-                <div className="bg-amber-50 p-1.5 rounded-lg border border-amber-200">
-                  <span className="text-amber-800 block uppercase font-black">Rented Out</span>
-                  <span className="text-xl font-black text-amber-700">{group.rentedCount}</span>
+                <div>
+                  <span className="text-[#74766f] text-[9px] uppercase block font-extrabold">Rented</span>
+                  <span className="text-base font-extrabold text-[#d35d2f]">{group.rentedCount}</span>
                 </div>
-                <div className="bg-blue-50 p-1.5 rounded-lg border border-blue-200">
-                  <span className="text-blue-800 block uppercase font-black">Service</span>
-                  <span className="text-xl font-black text-blue-700">{group.maintenanceCount}</span>
+                <div>
+                  <span className="text-[#74766f] text-[9px] uppercase block font-extrabold">Service</span>
+                  <span className="text-base font-extrabold text-[#5575ad]">{group.maintenanceCount}</span>
                 </div>
               </div>
 
-              {/* Physical Machine Code Pills */}
+              {/* Machine Code Pills */}
               <div>
-                <div className="text-xs font-black uppercase text-slate-500 mb-2">
-                  Physical Machines ({group.items.length}):
-                </div>
+                <span className="text-[10px] font-extrabold uppercase text-[#74766f] block mb-2">
+                  Physical Machines:
+                </span>
                 <div className="flex flex-wrap gap-2">
                   {group.items.map((item) => {
                     const isAvailable = item.status === 'AVAILABLE';
@@ -202,16 +195,16 @@ export const ToolsPage: React.FC<ToolsPageProps> = ({ onReturnTool }) => {
                         key={item.id}
                         onClick={() => setSelectedTool(item)}
                         type="button"
-                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-mono font-black text-sm border-2 transition-all min-h-[40px] shadow-xs ${
+                        className={`border rounded-[10px] px-3 py-1.5 font-mono font-extrabold text-xs transition-all flex items-center gap-1.5 ${
                           isAvailable
-                            ? 'bg-emerald-100 text-emerald-950 border-emerald-400 hover:bg-emerald-200'
+                            ? 'bg-[#eaf6f0] border-[#2f8a61] text-[#176d49]'
                             : isRented
-                            ? 'bg-amber-100 text-amber-950 border-amber-400 hover:bg-amber-200'
-                            : 'bg-blue-100 text-blue-950 border-blue-400 hover:bg-blue-200'
+                            ? 'bg-[#fff0e8] border-[#d35d2f] text-[#b84e27]'
+                            : 'bg-[#edf2fa] border-[#5575ad] text-[#2c4c84]'
                         }`}
                       >
                         <span>{item.tool_code}</span>
-                        <span className="text-[10px] font-sans uppercase font-bold px-1 rounded bg-white/70">
+                        <span className="text-[9px] font-sans uppercase font-bold opacity-75">
                           {item.status}
                         </span>
                       </button>

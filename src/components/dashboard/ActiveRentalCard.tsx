@@ -1,9 +1,7 @@
 import React from 'react';
-import { Phone, CornerDownLeft, Calendar, User, Wrench, AlertCircle } from 'lucide-react';
 import type { Rental } from '../../types/database';
 import { formatDateTime, getOverdueInfo } from '../../lib/dateUtils';
 import { LiveDurationBadge } from '../shared/LiveDurationBadge';
-import { StatusBadge } from '../shared/StatusBadge';
 
 interface ActiveRentalCardProps {
   rental: Rental;
@@ -17,98 +15,94 @@ export const ActiveRentalCard: React.FC<ActiveRentalCardProps> = ({
   onSelectRental,
 }) => {
   const overdueInfo = getOverdueInfo(rental.expected_return_at, rental.status);
+  const initialLetter = rental.customer_name ? rental.customer_name.charAt(0).toUpperCase() : 'C';
 
   return (
-    <div
-      className={`bg-white rounded-2xl p-4 sm:p-5 border-2 ${
-        overdueInfo.isOverdue
-          ? 'border-red-500 shadow-md ring-2 ring-red-200'
-          : 'border-amber-400 shadow-sm hover:shadow-md'
-      } transition-all space-y-4`}
-    >
-      {/* Top Bar: Customer & Status */}
-      <div className="flex items-start justify-between gap-3 pb-3 border-b border-slate-100">
+    <article className="border border-[#ded9d0] rounded-[14px] bg-white p-[16px] relative shadow-xs hover:shadow-md transition-all">
+      {/* Top Person Info & Status */}
+      <div className="flex justify-between items-start gap-[12px]">
         <div
           onClick={() => onSelectRental(rental)}
-          className="cursor-pointer group flex-1"
+          className="flex gap-[11px] items-center cursor-pointer group"
         >
-          <div className="flex items-center gap-2">
-            <User className="w-5 h-5 text-slate-500 shrink-0" />
-            <h3 className="text-xl sm:text-2xl font-black text-slate-900 group-hover:text-amber-600 transition-colors">
-              {rental.customer_name}
-            </h3>
+          <div className="w-[39px] h-[39px] rounded-[11px] bg-[#f4e9e1] text-[#d35d2f] grid place-items-center font-extrabold text-base shrink-0">
+            {initialLetter}
           </div>
-          <p className="text-sm font-bold text-slate-500 ml-7">
-            {rental.customer_phone} {rental.customer_address ? `• ${rental.customer_address}` : ''}
-          </p>
-        </div>
-
-        <div className="flex flex-col items-end gap-1 shrink-0">
-          <StatusBadge status={overdueInfo.isOverdue ? 'OVERDUE' : 'RENTED'} size="sm" />
-          {overdueInfo.isOverdue && (
-            <span className="inline-flex items-center gap-1 text-xs font-black text-red-600 bg-red-50 px-2 py-0.5 rounded-md">
-              <AlertCircle className="w-3.5 h-3.5" />
-              {overdueInfo.lateText}
-            </span>
-          )}
-        </div>
-      </div>
-
-      {/* Middle Bar: Tool Info & Timestamps */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-slate-50 p-3.5 rounded-xl border border-slate-200">
-        <div>
-          <div className="flex items-center gap-2 text-slate-500 text-xs font-black uppercase tracking-wider mb-1">
-            <Wrench className="w-4 h-4 text-amber-600" />
-            <span>TOOL TAKEN</span>
-          </div>
-          <div className="text-lg font-black text-slate-900">
-            {rental.tool_name}
-          </div>
-          <div className="inline-block mt-1 px-2.5 py-0.5 bg-amber-100 text-amber-950 font-black font-mono text-sm rounded-md border border-amber-300">
-            ID: {rental.tool_code}
-          </div>
-        </div>
-
-        <div className="flex flex-col justify-between sm:items-end">
           <div>
-            <div className="flex items-center gap-1.5 text-slate-500 text-xs font-black uppercase tracking-wider mb-1">
-              <Calendar className="w-4 h-4 text-slate-600" />
-              <span>TAKEN TIME</span>
-            </div>
-            <div className="text-sm font-bold text-slate-800">
-              {formatDateTime(rental.started_at)}
-            </div>
+            <b className="text-[16px] font-['Manrope'] text-[#20221f] group-hover:text-[#d35d2f] transition-colors block">
+              {rental.customer_name}
+            </b>
+            <small className="block text-[#74766f] text-[11px] mt-[2px]">
+              {rental.customer_phone} {rental.customer_address ? `· ${rental.customer_address}` : ''}
+            </small>
           </div>
+        </div>
 
-          <div className="mt-2 sm:mt-0 flex items-center gap-2">
-            <span className="text-xs font-black uppercase text-slate-500">Duration:</span>
-            <LiveDurationBadge startedAt={rental.started_at} />
-          </div>
+        <span
+          className={`text-[10px] font-extrabold px-[9px] py-[6px] rounded-[20px] h-max border ${
+            overdueInfo.isOverdue
+              ? 'bg-[#fde8e8] text-[#c94b48] border-[#f8b4b4]'
+              : 'bg-[#fff0e8] text-[#b84e27] border-[#fcd5c5]'
+          }`}
+        >
+          {overdueInfo.isOverdue ? '● OVERDUE' : '● RENTED OUT'}
+        </span>
+      </div>
+
+      {/* 3-Column Info Grid */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-[12px] my-[15px] py-[13px] border-y border-[#efede8]">
+        <div>
+          <label className="block text-[9px] text-[#92958d] uppercase font-extrabold tracking-[0.6px]">
+            Tool
+          </label>
+          <b className="text-[13px] text-[#20221f] block mt-[4px] font-bold">
+            {rental.tool_name}
+          </b>
+        </div>
+
+        <div>
+          <label className="block text-[9px] text-[#92958d] uppercase font-extrabold tracking-[0.6px]">
+            Machine
+          </label>
+          <b className="text-[13px] text-[#d35d2f] block mt-[4px] font-extrabold font-mono">
+            {rental.tool_code}
+          </b>
+        </div>
+
+        <div className="col-span-2 sm:col-span-1">
+          <label className="block text-[9px] text-[#92958d] uppercase font-extrabold tracking-[0.6px]">
+            Taken
+          </label>
+          <b className="text-[13px] text-[#20221f] block mt-[4px] font-medium">
+            {formatDateTime(rental.started_at)}
+          </b>
         </div>
       </div>
 
-      {/* Action Buttons Area */}
-      <div className="flex flex-col sm:flex-row items-stretch gap-2.5 pt-1">
-        {/* Primary Action Button: RETURN TOOL */}
-        <button
-          onClick={() => onReturnTool(rental)}
-          type="button"
-          className="flex-1 flex items-center justify-center gap-2.5 px-5 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-lg rounded-xl shadow-md hover:shadow-lg active:scale-98 transition-all min-h-[50px] border-2 border-emerald-400 uppercase tracking-wide"
-        >
-          <CornerDownLeft className="w-6 h-6 stroke-[3]" />
-          <span>RETURN TOOL</span>
-        </button>
+      {/* Timer & Actions Row */}
+      <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-[12px]">
+        <div className="flex items-center justify-between sm:justify-start gap-3">
+          <small className="text-[#74766f] text-[11px] font-bold block">Running time</small>
+          <LiveDurationBadge startedAt={rental.started_at} />
+        </div>
 
-        {/* Secondary Action Button: CALL CUSTOMER */}
-        <a
-          href={`tel:${rental.customer_phone}`}
-          className="flex items-center justify-center gap-2 px-4 py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold text-base rounded-xl transition-all min-h-[50px] border-2 border-slate-700 shrink-0"
-        >
-          <Phone className="w-5 h-5 text-emerald-400 stroke-[2.5]" />
-          <span className="sm:hidden">CALL</span>
-          <span className="hidden sm:inline">CALL CUSTOMER</span>
-        </a>
+        <div className="flex gap-[7px]">
+          <a
+            href={`tel:${rental.customer_phone}`}
+            className="border border-[#ded9d0] bg-white hover:bg-[#f6f3ed] text-[#20221f] rounded-[9px] px-[12px] py-[10px] font-bold text-xs inline-flex items-center justify-center gap-1 transition-all"
+          >
+            <span>☎ Call</span>
+          </a>
+
+          <button
+            onClick={() => onReturnTool(rental)}
+            type="button"
+            className="border-0 bg-[#2f8a61] hover:bg-[#256f4e] text-white rounded-[9px] px-[13px] py-[10px] font-extrabold text-xs inline-flex items-center justify-center gap-1 transition-all shadow-xs active:scale-98"
+          >
+            <span>↩ Return Tool</span>
+          </button>
+        </div>
       </div>
-    </div>
+    </article>
   );
 };

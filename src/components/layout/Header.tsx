@@ -1,40 +1,50 @@
 import React from 'react';
-import { PlusCircle, Wrench } from 'lucide-react';
+import { History, Plus } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
 import { getSettings } from '../../lib/storageService';
+import { formatDateOnly } from '../../lib/dateUtils';
 
 interface HeaderProps {
   onOpenNewRental: () => void;
+  onOpenHistory?: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ onOpenNewRental }) => {
+export const Header: React.FC<HeaderProps> = ({ onOpenNewRental, onOpenHistory }) => {
+  const { user } = useAuth();
   const settings = getSettings();
+  const ownerName = user?.name || 'Moosa';
+  const currentDateStr = formatDateOnly(new Date());
 
   return (
-    <header className="sticky top-0 z-30 bg-slate-900 text-white border-b-4 border-amber-500 shadow-md">
-      <div className="max-w-7xl mx-auto px-4 py-3 sm:px-6 flex items-center justify-between gap-3">
-        {/* Brand Title */}
-        <div className="flex items-center gap-3">
-          <div className="w-11 h-11 rounded-xl bg-amber-500 text-slate-950 flex items-center justify-center font-black shadow-md shrink-0">
-            <Wrench className="w-6 h-6 stroke-[2.5]" />
-          </div>
-          <div>
-            <h1 className="text-xl sm:text-2xl font-black tracking-tight leading-none text-white uppercase">
-              {settings.shop_name}
-            </h1>
-            <p className="text-xs sm:text-sm font-medium text-amber-400 mt-0.5">
-              Digital Rental Record Book
-            </p>
-          </div>
+    <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-2">
+      <div>
+        <h1 className="font-['Manrope'] text-[24px] sm:text-[29px] font-extrabold tracking-[-1px] text-[#20221f] m-0">
+          Good day, <span className="text-[#d35d2f]">{ownerName}</span>
+        </h1>
+        <div className="text-[#74766f] text-[13px] mt-[5px] font-medium">
+          {currentDateStr} · {settings.address || 'Kozhikode, Kerala'}
         </div>
+      </div>
 
-        {/* Primary Action Button (+ NEW RENTAL) */}
+      <div className="flex items-center gap-[9px] self-end sm:self-auto shrink-0">
+        {onOpenHistory && (
+          <button
+            onClick={onOpenHistory}
+            type="button"
+            className="hidden sm:inline-flex items-center justify-center gap-1.5 h-[44px] border border-[#ded9d0] bg-[#fdfcf9] hover:bg-[#f6f3ed] text-[#20221f] rounded-[11px] px-[15px] font-bold text-sm transition-all"
+          >
+            <History className="w-4 h-4 text-[#74766f]" />
+            <span>View History</span>
+          </button>
+        )}
+
         <button
           onClick={onOpenNewRental}
           type="button"
-          className="inline-flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-base sm:text-lg rounded-xl shadow-lg hover:shadow-xl active:scale-95 transition-all min-h-[48px] shrink-0 border-2 border-amber-300"
+          className="inline-flex items-center justify-center gap-2 h-[46px] border-0 bg-[#d35d2f] hover:bg-[#c25227] text-white rounded-[11px] px-[17px] font-['Manrope'] font-extrabold text-sm shadow-[0_7px_20px_#d35d2f2b] transition-all active:scale-98"
         >
-          <PlusCircle className="w-6 h-6 stroke-[2.5]" />
-          <span>+ NEW RENTAL</span>
+          <Plus className="w-5 h-5 stroke-[2.5]" />
+          <span>＋ New Rental</span>
         </button>
       </div>
     </header>

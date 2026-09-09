@@ -1,43 +1,65 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap');
 @import "tailwindcss";
 
-@layer base {
-  :root {
-    --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  }
+:root {
+  --bg: #eee9e1;
+  --paper: #fdfcf9;
+  --paper2: #f6f3ed;
+  --ink: #20221f;
+  --muted: #74766f;
+  --line: #ded9d0;
+  --orange: #d35d2f;
+  --orange2: #f2a36f;
+  --green: #2f8a61;
+  --red: #c94b48;
+  --blue: #5575ad;
+  --dark: #232621;
+  --shadow: 0 14px 40px rgba(43, 37, 28, 0.09);
+}
 
-  body {
-    font-family: var(--font-sans);
-    background-color: #f8fafc;
-    color: #0f172a;
-    -webkit-tap-highlight-color: transparent;
-    font-size: 17px;
-    line-height: 1.5;
-  }
+* {
+  box-sizing: border-box;
+}
 
-  /* Force minimum 48px touch targets for buttons and inputs */
-  button, input, select, textarea {
-    min-height: 48px;
-    font-size: 17px;
-  }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "DM Sans", system-ui, -apple-system, sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-tap-highlight-color: transparent;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Manrope", sans-serif;
+}
+
+button, input, select, textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
 }
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: var(--paper2);
 }
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: var(--line);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: var(--muted);
 }
 
-/* High contrast print stylesheet for rental receipts */
+/* Print Stylesheet for Receipt */
 @media print {
   body * {
     visibility: hidden;
@@ -51,9 +73,9 @@
     top: 0;
     width: 100%;
     margin: 0;
-    padding: 20px;
-    background: white;
-    color: black;
+    padding: 24px;
+    background: #ffffff;
+    color: #000000;
   }
   .no-print {
     display: none !important;

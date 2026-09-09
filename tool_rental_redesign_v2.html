@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TRAC — Tool Rental Dashboard</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap');
+:root{
+ --bg:#eee9e1;--paper:#fdfcf9;--paper2:#f6f3ed;--ink:#20221f;--muted:#74766f;--line:#ded9d0;
+ --orange:#d35d2f;--orange2:#f2a36f;--green:#2f8a61;--red:#c94b48;--blue:#5575ad;
+ --dark:#232621;--shadow:0 14px 40px rgba(43,37,28,.09);
+}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:"DM Sans",system-ui,sans-serif}
+button,input{font:inherit}button{cursor:pointer} .shell{min-height:100vh;display:flex}
+aside{width:252px;background:var(--dark);color:#fff;position:fixed;inset:0 auto 0 0;padding:25px 17px;display:flex;flex-direction:column}
+.logo{display:flex;align-items:center;gap:12px;padding:4px 10px 32px}.logoMark{width:43px;height:43px;border:2px solid #e7a37f;border-radius:13px;display:grid;place-items:center;font-family:Manrope;font-weight:800;color:#f5b28e}.logo strong{font-family:Manrope;letter-spacing:-.4px}.logo small{display:block;color:#9ea59d;font-size:11px;margin-top:2px}
+.shop{margin:0 7px 23px;background:#30352f;border:1px solid #3d433d;border-radius:13px;padding:13px}.shop span{font-size:10px;color:#9fa69e;text-transform:uppercase;font-weight:800;letter-spacing:.6px}.shop b{display:block;margin-top:4px;font-size:14px}.nav{display:grid;gap:4px}.nav button{border:0;background:none;color:#bfc4be;padding:13px 12px;border-radius:11px;text-align:left;font-weight:650}.nav button:hover,.nav button.active{background:#353a34;color:#fff}.nav i{font-style:normal;display:inline-block;width:25px;color:#d8ddd7}.asideFoot{margin-top:auto;border-top:1px solid #3a3f39;padding-top:16px;display:flex;align-items:center;gap:10px}.avatar{width:38px;height:38px;border-radius:50%;background:#e2ddd4;color:#34362f;display:grid;place-items:center;font-weight:800}.asideFoot small{display:block;color:#9fa59e;font-size:11px;margin-top:2px}
+main{margin-left:252px;width:calc(100% - 252px);padding:28px 34px 50px}.page{max-width:1280px;margin:auto}
+.header{display:flex;align-items:center;justify-content:space-between;gap:20px}.hello{font-family:Manrope;font-size:29px;font-weight:800;letter-spacing:-1px}.hello span{color:var(--orange)}.sub{color:var(--muted);font-size:13px;margin-top:5px}
+.actionsTop{display:flex;gap:9px}.iconBtn,.ghost{height:44px;border:1px solid var(--line);background:var(--paper);border-radius:11px;padding:0 13px;font-weight:700}.primary{height:46px;border:0;background:var(--orange);color:#fff;border-radius:11px;padding:0 17px;font-weight:800;box-shadow:0 7px 20px #d35d2f2b}
+.hero{margin-top:25px;background:var(--dark);border-radius:20px;color:#fff;padding:25px 27px;display:grid;grid-template-columns:1.5fr 1fr;gap:22px;box-shadow:var(--shadow);position:relative;overflow:hidden}.hero:after{content:"";position:absolute;width:270px;height:270px;border:1px solid #ffffff16;border-radius:50%;right:-90px;top:-120px;box-shadow:0 0 0 34px #ffffff06,0 0 0 68px #ffffff03}.heroLabel{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#aeb5ad;font-weight:800}.hero h2{font-family:Manrope;font-size:29px;line-height:1.1;margin:8px 0}.hero p{color:#b8beb8;font-size:13px;max-width:530px;margin:0}.heroStats{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-content:center}.hs{background:#30352f;border:1px solid #41463f;border-radius:13px;padding:14px}.hs b{font-size:25px;font-family:Manrope}.hs span{display:block;color:#aeb5ad;font-size:11px;margin-top:2px}.dashboardGrid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(290px,.75fr);gap:18px;margin-top:18px}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow)}.panelHead{padding:18px 20px 14px;display:flex;justify-content:space-between;align-items:center}.panelHead h3{margin:0;font-family:Manrope;font-size:17px}.panelHead span{font-size:12px;color:var(--muted)}
+.rental{padding:0 15px 15px}.rCard{border:1px solid var(--line);border-radius:14px;background:#fff;margin-top:10px;padding:16px;position:relative}.rTop{display:flex;justify-content:space-between;gap:12px}.person{display:flex;gap:11px;align-items:center}.personIcon{width:39px;height:39px;border-radius:11px;background:#f4e9e1;color:var(--orange);display:grid;place-items:center;font-weight:900}.person b{font-size:16px}.person small{display:block;color:var(--muted);font-size:11px;margin-top:2px}.status{font-size:10px;font-weight:900;padding:6px 9px;border-radius:20px;height:max-content;background:#fff0e8;color:#b84e27}.rInfo{display:grid;grid-template-columns:1.4fr .7fr .9fr;gap:12px;margin:15px 0;padding:13px 0;border-top:1px solid #efede8;border-bottom:1px solid #efede8}.rInfo label{display:block;font-size:9px;color:#92958d;text-transform:uppercase;font-weight:900;letter-spacing:.6px}.rInfo b{font-size:13px;display:block;margin-top:4px}.timerRow{display:flex;justify-content:space-between;align-items:center}.timer small{color:var(--muted);font-size:11px}.timer strong{font-family:Manrope;font-size:22px;letter-spacing:-.5px}.rActions{display:flex;gap:7px}.return{border:0;background:var(--green);color:#fff;border-radius:9px;padding:10px 13px;font-weight:850}.call{border:1px solid var(--line);background:#fff;border-radius:9px;padding:10px 12px;font-weight:800}
+.sideStack{display:grid;gap:18px}.miniStats{padding:16px;display:grid;gap:9px}.mini{display:flex;align-items:center;justify-content:space-between;padding:13px;border-radius:12px;background:var(--paper2);border:1px solid var(--line)}.miniLeft{display:flex;align-items:center;gap:10px}.miniIcon{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;font-weight:900;background:#fff}.mini b{font-size:14px}.mini small{display:block;color:var(--muted);font-size:10px;margin-top:2px}.mini strong{font-family:Manrope;font-size:19px}
+.tools{padding:0 15px 16px}.toolSearch{height:42px;border:1px solid var(--line);background:#fff;border-radius:10px;width:100%;padding:0 12px;outline:0;margin-bottom:10px}.toolRow{display:flex;align-items:center;justify-content:space-between;padding:12px 4px;border-bottom:1px solid #eeeae4}.toolName{display:flex;align-items:center;gap:10px}.toolIcon{width:35px;height:35px;border-radius:9px;background:#eeeae3;display:grid;place-items:center;font-size:16px}.toolName b{font-size:13px}.toolName small{display:block;color:var(--muted);font-size:10px;margin-top:2px}.dots{display:flex;gap:4px}.dot{width:8px;height:8px;border-radius:50%;background:#d8ddd8}.dot.on{background:var(--orange)}.toolCount{font-size:11px;color:var(--muted)}
+.activity{padding:0 20px 18px}.activityItem{display:grid;grid-template-columns:43px 1fr auto;gap:11px;align-items:center;padding:13px 0;border-bottom:1px solid #eeeae4}.time{font-size:10px;color:var(--muted);font-weight:700}.actIcon{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;background:#edf7f1;color:var(--green);font-weight:900}.activityItem b{font-size:12px}.activityItem small{display:block;color:var(--muted);font-size:10px;margin-top:2px}.amount{font-weight:900;font-size:12px}
+.bottomGrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;margin-top:18px}.bottomCard{background:var(--paper);border:1px solid var(--line);border-radius:17px;padding:19px;box-shadow:var(--shadow)}.bottomCard h3{font-family:Manrope;font-size:16px;margin:0}.bottomCard p{font-size:12px;color:var(--muted);line-height:1.5}.bigNum{font-family:Manrope;font-size:30px;font-weight:800;margin-top:13px}.bar{height:7px;border-radius:10px;background:#e7e4dd;overflow:hidden;margin-top:12px}.bar i{display:block;width:72%;height:100%;background:var(--orange);border-radius:10px}.link{margin-top:14px;border:0;background:none;color:var(--orange);font-weight:850;padding:0}
+
+/* modal */
+.overlay{position:fixed;inset:0;background:#171a18aa;backdrop-filter:blur(5px);display:none;align-items:center;justify-content:center;padding:18px;z-index:30}.overlay.show{display:flex}.modal{width:min(590px,100%);max-height:92vh;overflow:auto;background:var(--paper);border-radius:20px;box-shadow:0 30px 90px #0004}.mHead{padding:20px 22px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between}.mHead h2{margin:0;font-family:Manrope;font-size:21px}.close{border:0;background:#ebe9e3;border-radius:50%;width:35px;height:35px;font-size:19px}.mBody{padding:20px 22px}.stepbar{display:flex;gap:6px;margin-bottom:18px}.seg{height:4px;background:#e3dfd7;border-radius:8px;flex:1}.seg.on{background:var(--orange)}.caption{font-size:10px;color:var(--muted);font-weight:900;text-transform:uppercase;letter-spacing:.8px}.mBody h3{font-family:Manrope;font-size:25px;margin:5px 0 17px}.search{width:100%;height:50px;border:1px solid var(--line);border-radius:11px;padding:0 13px;outline:0;background:#fff}.opt{width:100%;background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px;margin-top:8px;text-align:left;display:flex;justify-content:space-between;align-items:center}.opt b{font-size:14px}.opt small{display:block;color:var(--muted);font-size:11px;margin-top:3px}.select{font-size:10px;color:var(--orange);font-weight:900}.cats{display:flex;gap:7px;overflow:auto;margin-bottom:11px}.cat{white-space:nowrap;background:#fff;border:1px solid var(--line);border-radius:20px;padding:8px 11px;font-size:10px;font-weight:850}.cat.active{background:var(--dark);color:#fff}.machines{display:grid;grid-template-columns:1fr 1fr;gap:8px}.machine{margin:0}.machine.disabled{opacity:.42}.confirm{background:#f1eee8;border:1px solid var(--line);border-radius:12px;padding:13px;margin-bottom:12px}.line{display:flex;justify-content:space-between;padding:5px 0;font-size:13px}.line span{color:var(--muted)}.footer{display:flex;gap:8px;margin-top:16px}.footer>*{flex:1;height:49px}.success{text-align:center;padding:30px 20px}.check{width:60px;height:60px;border-radius:50%;background:#e8f5ee;color:var(--green);display:grid;place-items:center;margin:auto auto 14px;font-size:29px;font-weight:900}.success h2{margin:0;font-family:Manrope}.success p{color:var(--muted);font-size:12px}.returnBox{background:#f1eee8;border:1px solid var(--line);border-radius:13px;padding:15px}.timeLine{display:flex;justify-content:space-between;color:var(--muted);font-size:10px;margin-top:12px}.timeLine b{color:var(--ink);font-size:11px}.bigTime{text-align:center;font-family:Manrope;font-size:33px;font-weight:900;margin:12px 0 0}.conditions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}.condition{border:1px solid var(--line);background:#fff;border-radius:10px;padding:13px;text-align:left;font-size:12px;font-weight:800}.condition.selected{border-color:var(--green);background:#eaf6f0;color:#176d49}.money{width:100%;height:54px;border:1px solid var(--line);border-radius:11px;text-align:center;font-size:22px;font-weight:900;outline:0;margin-top:8px}.toast{position:fixed;right:20px;bottom:20px;background:var(--dark);color:#fff;padding:13px 16px;border-radius:10px;display:none;z-index:50;font-weight:700}.toast.show{display:block}
+@media(max-width:1000px){aside{display:none}main{margin:0;width:100%;padding:22px 20px 88px}.hero{grid-template-columns:1fr}.dashboardGrid{grid-template-columns:1fr}.bottomGrid{grid-template-columns:1fr 1fr}}
+@media(max-width:650px){.header{align-items:center}.hello{font-size:23px}.actionsTop .ghost{display:none}.hero{padding:21px}.hero h2{font-size:24px}.heroStats{grid-template-columns:1fr 1fr}.metrics{}.dashboardGrid{margin-top:13px}.rInfo{grid-template-columns:1fr 1fr}.rInfo>div:last-child{grid-column:1/-1}.timerRow{align-items:stretch;gap:12px;flex-direction:column}.rActions{display:grid;grid-template-columns:1fr 1fr}.return{grid-column:1/-1;order:-1}.bottomGrid{grid-template-columns:1fr}.mobileNav{position:fixed;display:grid!important;grid-template-columns:repeat(5,1fr);left:0;right:0;bottom:0;height:68px;background:#fff;border-top:1px solid var(--line);z-index:20}.mobileNav button{border:0;background:none;font-size:9px;color:var(--muted);font-weight:850}.mobileNav button.active{color:var(--orange)}.mobileNav i{display:block;font-style:normal;font-size:18px;margin-bottom:3px}}
+@media(min-width:651px){.mobileNav{display:none}}
+</style>
+</head>
+<body>
+<div class="shell">
+<aside>
+  <div class="logo"><div class="logoMark">TR</div><div><strong>TOOL RENTAL</strong><small>Digital rental book</small></div></div>
+  <div class="shop"><span>Shop</span><b>Wayanaad Tool Rentals</b></div>
+  <nav class="nav">
+    <button class="active"><i>⌂</i>Dashboard</button><button><i>↗</i>Active Rentals</button><button><i>⚒</i>Tools</button><button><i>♙</i>Customers</button><button><i>▤</i>Rental History</button>
+  </nav>
+  <div class="asideFoot"><div class="avatar">M</div><div><b>Moosa</b><small>Shop owner</small></div></div>
+</aside>
+
+<main><div class="page">
+<header class="header">
+  <div><div class="hello">Good evening, <span>Moosa</span></div><div class="sub">Wednesday · 09 September 2026 · Kozhikode</div></div>
+  <div class="actionsTop"><button class="iconBtn" onclick="toast('Search opened')">⌕</button><button class="ghost" onclick="toast('History opened')">View History</button><button class="primary" onclick="openRental()">＋ New Rental</button></div>
+</header>
+
+<section class="hero">
+  <div><div class="heroLabel">Today's shop overview</div><h2>Know what is outside.<br>Know what came back.</h2><p>Your rental book is now organised, searchable and automatically timed.</p></div>
+  <div class="heroStats"><div class="hs"><b>2</b><span>Tools outside</span></div><div class="hs"><b>1</b><span>Due today</span></div><div class="hs"><b>18</b><span>Available tools</span></div><div class="hs"><b>₹1,250</b><span>Collected today</span></div></div>
+</section>
+
+<div class="dashboardGrid">
+<section class="panel">
+ <div class="panelHead"><h3>Currently out</h3><span>2 active rentals</span></div>
+ <div class="rental" id="rentals">
+  <article class="rCard" data-start="2026-09-09T16:20:00" data-name="Afsal" data-tool="Drilling Machine" data-code="DR-04">
+   <div class="rTop"><div class="person"><div class="personIcon">A</div><div><b>Afsal</b><small>98XXXXXX12 · Panamaram</small></div></div><span class="status">● RENTED OUT</span></div>
+   <div class="rInfo"><div><label>Tool</label><b>Drilling Machine</b></div><div><label>Machine</label><b>DR-04</b></div><div><label>Taken</label><b>09 Sep · 4:20 PM</b></div></div>
+   <div class="timerRow"><div class="timer"><small>Running time</small><strong class="live">—</strong></div><div class="rActions"><button class="call" onclick="call('9847123456')">☎ Call</button><button class="return" onclick="openReturn(this)">↩ Return Tool</button></div></div>
+  </article>
+  <article class="rCard" data-start="2026-09-08T16:15:00" data-name="Riyas" data-tool="Car Washer" data-code="CW-02">
+   <div class="rTop"><div class="person"><div class="personIcon">R</div><div><b>Riyas</b><small>97XXXXXX45 · Kozhikode</small></div></div><span class="status">● RENTED OUT</span></div>
+   <div class="rInfo"><div><label>Tool</label><b>Car Washer</b></div><div><label>Machine</label><b>CW-02</b></div><div><label>Taken</label><b>08 Sep · 4:15 PM</b></div></div>
+   <div class="timerRow"><div class="timer"><small>Running time</small><strong class="live">—</strong></div><div class="rActions"><button class="call" onclick="call('9700000000')">☎ Call</button><button class="return" onclick="openReturn(this)">↩ Return Tool</button></div></div>
+  </article>
+ </div>
+</section>
+
+<div class="sideStack">
+<section class="panel"><div class="panelHead"><h3>Today's attention</h3><span>09 Sep</span></div><div class="miniStats">
+ <div class="mini"><div class="miniLeft"><div class="miniIcon" style="color:var(--blue)">↩</div><div><b>Due today</b><small>1 tool expected back</small></div></div><strong>1</strong></div>
+ <div class="mini"><div class="miniLeft"><div class="miniIcon" style="color:var(--red)">!</div><div><b>Overdue</b><small>No overdue tools</small></div></div><strong>0</strong></div>
+ <div class="mini"><div class="miniLeft"><div class="miniIcon" style="color:var(--green)">✓</div><div><b>Returned today</b><small>2 tools completed</small></div></div><strong>2</strong></div>
+</div></section>
+
+<section class="panel"><div class="panelHead"><h3>Tools at a glance</h3><span>24 total</span></div><div class="tools">
+ <input class="toolSearch" placeholder="Search tool..." oninput="searchTools(this.value)">
+ <div class="toolRow"><div class="toolName"><div class="toolIcon">⚒</div><div><b>Drilling Machine</b><small>4 machines</small></div></div><div class="dots"><i class="dot on"></i><i class="dot on"></i><i class="dot"></i><i class="dot"></i></div><span class="toolCount">2 free</span></div>
+ <div class="toolRow"><div class="toolName"><div class="toolIcon">◒</div><div><b>Car Washer</b><small>3 machines</small></div></div><div class="dots"><i class="dot on"></i><i class="dot"></i><i class="dot"></i></div><span class="toolCount">1 free</span></div>
+ <div class="toolRow"><div class="toolName"><div class="toolIcon">◈</div><div><b>Grinder</b><small>4 machines</small></div></div><div class="dots"><i class="dot on"></i><i class="dot on"></i><i class="dot on"></i><i class="dot"></i></div><span class="toolCount">4 free</span></div>
+</div></section>
+</div>
+</div>
+
+<div class="bottomGrid">
+<section class="bottomCard"><h3>Rental activity</h3><p>Today's completed rentals</p><div class="bigNum">8 <span style="font-size:13px;color:var(--muted);font-family:inherit">records</span></div><div class="bar"><i></i></div><button class="link" onclick="toast('Rental history opened')">Open history →</button></section>
+<section class="bottomCard"><h3>Customer book</h3><p>Search anyone who has rented before.</p><div class="bigNum">126 <span style="font-size:13px;color:var(--muted);font-family:inherit">customers</span></div><button class="link" onclick="toast('Customer directory opened')">View customers →</button></section>
+<section class="bottomCard"><h3>Quick reminder</h3><p>Keep the physical tools and digital record in sync after every return.</p><button class="link" onclick="openRental()">＋ Start a rental</button></section>
+</div>
+</div></main>
+</div>
+
+<nav class="mobileNav" style="display:none"><button class="active"><i>⌂</i>HOME</button><button><i>↗</i>RENTALS</button><button><i>⚒</i>TOOLS</button><button><i>♙</i>CUSTOMERS</button><button><i>▤</i>HISTORY</button></nav>
+
+<div class="overlay" id="rentalOverlay"><div class="modal"><div class="mHead"><h2>New Rental</h2><button class="close" onclick="closeAll()">×</button></div><div class="mBody" id="rentalBody"></div></div></div>
+<div class="overlay" id="returnOverlay"><div class="modal"><div class="mHead"><h2>Return Tool</h2><button class="close" onclick="closeAll()">×</button></div><div class="mBody" id="returnBody"></div></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+let clock=new Date('2026-09-09T21:46:00'),step=1,customer=null,tool=null,machine=null,returnCard=null;
+const $=s=>document.querySelector(s);
+function duration(a,b=clock){let m=Math.max(0,Math.floor((b-a)/60000)),d=Math.floor(m/1440);m%=1440;let h=Math.floor(m/60),x=m%60;return d?`${d}d ${h}h${x?' '+x+'m':''}`:h?`${h}h ${x}m`:`${x}m`}
+function date(d){return d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})}
+function time(d){return d.toLocaleTimeString('en-IN',{hour:'numeric',minute:'2-digit'})}
+function tick(){document.querySelectorAll('.rCard').forEach(c=>c.querySelector('.live').textContent=duration(new Date(c.dataset.start)))}tick();setInterval(()=>{clock.setMinutes(clock.getMinutes()+1);tick()},60000);
+function openRental(){step=1;customer=null;tool=null;machine=null;$('#rentalOverlay').classList.add('show');renderRental()}
+function closeAll(){document.querySelectorAll('.overlay').forEach(x=>x.classList.remove('show'))}
+function renderRental(){let b=$('#rentalBody');let bars=`<div class="stepbar"><i class="seg ${step>=1?'on':''}"></i><i class="seg ${step>=2?'on':''}"></i><i class="seg ${step>=3?'on':''}"></i></div>`;
+if(step===1)b.innerHTML=bars+`<div class="caption">1 / 3 · Customer</div><h3>Who is taking the tool?</h3><input class="search" placeholder="Search name or phone" oninput="filter('.customerOpt',this.value)"><div class="customerOpt"><button class="opt customerOpt" onclick="pickCustomer('Afsal','98XXXXXX12','Panamaram')"><div><b>Afsal</b><small>98XXXXXX12 · Panamaram</small></div><span class="select">SELECT</span></button><button class="opt customerOpt" onclick="pickCustomer('Riyas','97XXXXXX45','Kozhikode')"><div><b>Riyas</b><small>97XXXXXX45 · Kozhikode</small></div><span class="select">SELECT</span></button></div><button class="opt" onclick="toast('Add customer form — prototype')"><b>＋ Add New Customer</b></button>`;
+else if(step===2)b.innerHTML=bars+`<div class="caption">2 / 3 · Tool</div><h3>What are they taking?</h3><div class="cats"><button class="cat active">All</button><button class="cat">Drilling</button><button class="cat">Cutting</button><button class="cat">Cleaning</button><button class="cat">Pumps</button><button class="cat">Welding</button></div><input class="search" placeholder="Search tool..." oninput="filter('.toolOpt',this.value)"><button class="opt toolOpt" onclick="pickTool('Drilling Machine')"><div><b>Drilling Machine</b><small>3 available</small></div><span class="select">SELECT</span></button><button class="opt toolOpt" onclick="pickTool('Cutter')"><div><b>Cutter</b><small>2 available</small></div><span class="select">SELECT</span></button><button class="opt toolOpt" onclick="pickTool('Car Washer')"><div><b>Car Washer</b><small>1 available</small></div><span class="select">SELECT</span></button><button class="opt toolOpt" onclick="pickTool('Grinder')"><div><b>Grinder</b><small>4 available</small></div><span class="select">SELECT</span></button>`;
+else b.innerHTML=bars+`<div class="caption">3 / 3 · Machine</div><h3>Choose the machine</h3><div class="confirm"><div class="line"><span>Customer</span><b>${customer.name}</b></div><div class="line"><span>Tool</span><b>${tool}</b></div></div><div class="machines"><button class="opt machine" onclick="pickMachine(this,'DR-01')"><div><b>DR-01</b><small>Available</small></div></button><button class="opt machine" onclick="pickMachine(this,'DR-02')"><div><b>DR-02</b><small>Available</small></div></button><button class="opt machine disabled"><div><b>DR-03</b><small>Rented</small></div></button><button class="opt machine" onclick="pickMachine(this,'DR-04')"><div><b>DR-04</b><small>Available</small></div></button></div><div class="footer"><button class="secondary" onclick="step=2;renderRental()">Back</button><button class="primary" id="start" disabled onclick="startRental()">Start Rental</button></div>`;
+}
+function pickCustomer(n,p,a){customer={name:n,phone:p,address:a};step=2;renderRental()}function pickTool(t){tool=t;step=3;renderRental()}function pickMachine(el,m){machine=m;document.querySelectorAll('.machine').forEach(x=>x.style.borderColor='');el.style.borderColor='var(--orange)';$('#start').disabled=false}
+function startRental(){$('#rentalBody').innerHTML=`<div class="success"><div class="check">✓</div><h2>Rental Started</h2><p>The digital record has been created.</p><div class="confirm"><div class="line"><span>Customer</span><b>${customer.name}</b></div><div class="line"><span>Tool</span><b>${tool}</b></div><div class="line"><span>Machine</span><b>${machine}</b></div><div class="line"><span>Started</span><b>${date(clock)} · ${time(clock)}</b></div></div><div class="footer"><button class="primary" onclick="closeAll();toast('Rental started successfully')">Done</button></div></div>`}
+function filter(sel,v){document.querySelectorAll(sel).forEach(x=>x.style.display=x.textContent.toLowerCase().includes(v.toLowerCase())?'flex':'none')}
+function openReturn(btn){returnCard=btn.closest('.rCard');let s=new Date(returnCard.dataset.start);$('#returnBody').innerHTML=`<div class="caption">Active rental</div><h3>${returnCard.dataset.name}</h3><div class="returnBox"><b>${returnCard.dataset.tool} · ${returnCard.dataset.code}</b><div class="timeLine"><span>Taken<br><b>${date(s)} · ${time(s)}</b></span><span style="text-align:right">Returned<br><b>${date(clock)} · ${time(clock)}</b></span></div><div class="bigTime">${duration(s)}</div><div style="text-align:center;color:var(--muted);font-size:10px;font-weight:850">TOTAL RENTAL TIME</div></div><div class="panelHead" style="padding:18px 0 5px"><h3>Tool condition</h3></div><div class="conditions"><button class="condition selected" onclick="condition(this)">✓ Good</button><button class="condition" onclick="condition(this)">Minor Damage</button><button class="condition" onclick="condition(this)">Damaged</button><button class="condition" onclick="condition(this)">Needs Service</button></div><div class="panelHead" style="padding:18px 0 0"><h3>Rent amount</h3></div><input class="money" placeholder="₹ 0" inputmode="decimal"><div class="footer"><button class="secondary" onclick="closeAll()">Cancel</button><button class="return" onclick="completeReturn()">Complete Return</button></div>`;$('#returnOverlay').classList.add('show')}
+function condition(el){document.querySelectorAll('.condition').forEach(x=>x.classList.remove('selected'));el.classList.add('selected')}
+function completeReturn(){returnCard.remove();closeAll();toast('Return completed and saved')}
+function call(n){toast('Opening phone dialer…');setTimeout(()=>location.href='tel:'+n,250)}function searchTools(v){toast(v?'Filtering tools…':'Showing all tools')}function toast(m){let t=$('#toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}
+</script>
+</body>
+</html>

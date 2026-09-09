@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Wrench, LogIn, ShieldCheck } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export const Login: React.FC = () => {
@@ -13,25 +12,25 @@ export const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 flex flex-col justify-center items-center p-4">
-      <div className="w-full max-w-md bg-white rounded-3xl p-6 sm:p-8 shadow-2xl border-4 border-amber-500 space-y-6">
+    <div className="min-h-screen bg-[#232621] text-white flex flex-col justify-center items-center p-4">
+      <div className="w-full max-w-md bg-[#fdfcf9] text-[#20221f] rounded-[20px] p-6 sm:p-8 shadow-[0_30px_90px_rgba(0,0,0,0.25)] border border-[#ded9d0] space-y-6">
         {/* Brand Header */}
         <div className="text-center space-y-2">
-          <div className="w-16 h-16 bg-amber-500 text-slate-950 rounded-2xl mx-auto flex items-center justify-center font-black shadow-lg">
-            <Wrench className="w-9 h-9 stroke-[2.5]" />
+          <div className="w-[50px] h-[50px] border-2 border-[#e7a37f] bg-[#232621] text-[#f5b28e] rounded-[14px] mx-auto flex items-center justify-center font-['Manrope'] font-extrabold text-xl shadow-md">
+            TR
           </div>
-          <h1 className="text-3xl font-black tracking-tight text-slate-900 uppercase mt-3">
+          <h1 className="text-2xl font-['Manrope'] font-extrabold tracking-[-0.4px] text-[#20221f] uppercase mt-3 m-0">
             TOOL RENTAL
           </h1>
-          <p className="text-base font-bold text-amber-600 uppercase tracking-wide">
-            Simple Rental Record Book
+          <p className="text-xs font-bold text-[#d35d2f] uppercase tracking-wide">
+            Digital Rental Book
           </p>
         </div>
 
         {/* Login Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-black text-slate-800 uppercase tracking-wide mb-1">
+            <label className="block text-xs font-extrabold text-[#20221f] uppercase mb-1">
               Email Address
             </label>
             <input
@@ -39,13 +38,13 @@ export const Login: React.FC = () => {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl border-2 border-slate-300 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-hidden font-bold text-slate-900 text-lg"
+              className="w-full h-[48px] px-3 rounded-[11px] border border-[#ded9d0] focus:border-[#d35d2f] outline-hidden font-medium text-[#20221f] bg-white text-base"
               placeholder="owner@toolrental.com"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-black text-slate-800 uppercase tracking-wide mb-1">
+            <label className="block text-xs font-extrabold text-[#20221f] uppercase mb-1">
               Password
             </label>
             <input
@@ -53,25 +52,23 @@ export const Login: React.FC = () => {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl border-2 border-slate-300 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-hidden font-bold text-slate-900 text-lg"
+              className="w-full h-[48px] px-3 rounded-[11px] border border-[#ded9d0] focus:border-[#d35d2f] outline-hidden font-medium text-[#20221f] bg-white text-base"
               placeholder="••••••••"
             />
           </div>
 
           <button
             type="submit"
-            className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xl rounded-xl shadow-xl hover:shadow-2xl active:scale-98 transition-all border-2 border-amber-400 min-h-[52px] mt-6 uppercase tracking-wider"
+            className="w-full flex items-center justify-center h-[50px] bg-[#d35d2f] hover:bg-[#c25227] text-white font-['Manrope'] font-extrabold text-base rounded-[11px] shadow-[0_7px_20px_#d35d2f2b] transition-all border-0 mt-6 uppercase"
           >
-            <LogIn className="w-6 h-6 stroke-[3]" />
-            <span>LOGIN</span>
+            <span>LOGIN TO RENTAL BOOK</span>
           </button>
         </form>
 
-        <div className="pt-4 border-t border-slate-200 text-center">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 rounded-lg text-slate-700 text-xs font-bold">
-            <ShieldCheck className="w-4 h-4 text-emerald-600" />
-            <span>Protected Local & Cloud Sync Session</span>
-          </div>
+        <div className="pt-2 border-t border-[#ded9d0] text-center">
+          <span className="text-[11px] font-bold text-[#74766f]">
+            Wayanaad Tool Rentals · Owner Portal
+          </span>
         </div>
       </div>
     </div>

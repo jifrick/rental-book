@@ -1,7 +1,5 @@
 import React from 'react';
-import { Package, Clock, AlertTriangle, CheckCircle } from 'lucide-react';
 import type { Rental, Tool } from '../../types/database';
-import { getOverdueInfo, formatDateOnly } from '../../lib/dateUtils';
 
 interface SummaryCardsProps {
   rentals: Rental[];
@@ -12,86 +10,86 @@ interface SummaryCardsProps {
 export const SummaryCards: React.FC<SummaryCardsProps> = ({ rentals, tools, onFilterClick }) => {
   const activeRentals = rentals.filter((r) => r.status === 'ACTIVE');
   
-  const todayStr = formatDateOnly(new Date());
   const dueTodayCount = activeRentals.filter((r) => {
     if (!r.expected_return_at) return false;
-    return formatDateOnly(r.expected_return_at) === todayStr;
+    const todayStr = new Date().toDateString();
+    return new Date(r.expected_return_at).toDateString() === todayStr;
   }).length;
-
-  const overdueCount = activeRentals.filter((r) => getOverdueInfo(r.expected_return_at, r.status).isOverdue).length;
 
   const availableToolsCount = tools.filter((t) => t.status === 'AVAILABLE').length;
 
-  const cards = [
-    {
-      title: 'ACTIVE RENTALS',
-      value: activeRentals.length,
-      subtitle: 'Tools currently outside',
-      icon: Package,
-      badgeColor: 'bg-amber-500 text-slate-950',
-      borderColor: 'border-amber-400',
-      filter: 'active' as const,
-    },
-    {
-      title: 'DUE TODAY',
-      value: dueTodayCount,
-      subtitle: 'Expected returns today',
-      icon: Clock,
-      badgeColor: 'bg-blue-500 text-white',
-      borderColor: 'border-blue-400',
-      filter: 'all' as const,
-    },
-    {
-      title: 'OVERDUE',
-      value: overdueCount,
-      subtitle: 'Past return time',
-      icon: AlertTriangle,
-      badgeColor: overdueCount > 0 ? 'bg-red-600 text-white animate-pulse' : 'bg-slate-400 text-white',
-      borderColor: overdueCount > 0 ? 'border-red-500' : 'border-slate-300',
-      filter: 'overdue' as const,
-    },
-    {
-      title: 'AVAILABLE TOOLS',
-      value: availableToolsCount,
-      subtitle: 'Ready to rent inside shop',
-      icon: CheckCircle,
-      badgeColor: 'bg-emerald-600 text-white',
-      borderColor: 'border-emerald-400',
-      filter: 'available' as const,
-    },
-  ];
+  // Calculate collected today sum
+  const todayStr = new Date().toDateString();
+  const collectedToday = rentals
+    .filter((r) => r.returned_at && new Date(r.returned_at).toDateString() === todayStr)
+    .reduce((sum, r) => sum + (r.total_amount || 0), 0);
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
-      {cards.map((card, idx) => {
-        const Icon = card.icon;
-        return (
-          <button
-            key={idx}
-            onClick={() => onFilterClick && onFilterClick(card.filter)}
-            type="button"
-            className={`flex flex-col justify-between p-4 bg-white rounded-2xl border-2 ${card.borderColor} shadow-sm hover:shadow-md transition-all text-left group`}
-          >
-            <div className="flex items-center justify-between gap-2">
-              <span className="text-xs font-black uppercase tracking-wider text-slate-600">
-                {card.title}
-              </span>
-              <div className={`p-2 rounded-xl ${card.badgeColor} shadow-xs shrink-0`}>
-                <Icon className="w-5 h-5 stroke-[2.5]" />
-              </div>
-            </div>
+    <section className="mt-[25px] bg-[#232621] rounded-[20px] text-white p-[21px] sm:p-[25px_27px] grid grid-cols-1 lg:grid-cols-[1.5fr_1fr] gap-[22px] shadow-[0_14px_40px_rgba(43,37,28,0.09)] relative overflow-hidden">
+      {/* Decorative radial blur circle */}
+      <div className="hidden sm:block absolute w-[270px] h-[270px] border border-white/10 rounded-full -right-[90px] -top-[120px] shadow-[0_0_0_34px_rgba(255,255,255,0.02),0_0_0_68px_rgba(255,255,255,0.01)] pointer-events-none" />
 
-            <div className="mt-3">
-              <div className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
-                {card.value}
-              </div>
-              <p className="text-xs font-bold text-slate-500 mt-0.5 truncate">
-                {card.subtitle}
-              </p>
-            </div>
-          </button>
-        );
-      })}
-    </div>
+      <div>
+        <div className="text-[11px] tracking-[1px] uppercase text-[#aeb5ad] font-extrabold">
+          Today's shop overview
+        </div>
+        <h2 className="font-['Manrope'] text-[24px] sm:text-[29px] leading-[1.1] my-[8px] font-extrabold text-white">
+          Know what is outside.<br className="hidden sm:inline" /> Know what came back.
+        </h2>
+        <p className="text-[#b8beb8] text-[13px] max-w-[530px] m-0 font-medium">
+          Your rental book is now organised, searchable and automatically timed.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-2 gap-[10px] content-center">
+        <button
+          onClick={() => onFilterClick && onFilterClick('active')}
+          type="button"
+          className="bg-[#30352f] hover:bg-[#383e37] border border-[#41463f] rounded-[13px] p-[14px] text-left transition-all cursor-pointer"
+        >
+          <b className="text-[22px] sm:text-[25px] font-['Manrope'] font-extrabold text-white block">
+            {activeRentals.length}
+          </b>
+          <span className="block text-[#aeb5ad] text-[11px] mt-[2px] font-bold">
+            Tools outside
+          </span>
+        </button>
+
+        <button
+          onClick={() => onFilterClick && onFilterClick('all')}
+          type="button"
+          className="bg-[#30352f] hover:bg-[#383e37] border border-[#41463f] rounded-[13px] p-[14px] text-left transition-all cursor-pointer"
+        >
+          <b className="text-[22px] sm:text-[25px] font-['Manrope'] font-extrabold text-[#f2a36f] block">
+            {dueTodayCount}
+          </b>
+          <span className="block text-[#aeb5ad] text-[11px] mt-[2px] font-bold">
+            Due today
+          </span>
+        </button>
+
+        <button
+          onClick={() => onFilterClick && onFilterClick('available')}
+          type="button"
+          className="bg-[#30352f] hover:bg-[#383e37] border border-[#41463f] rounded-[13px] p-[14px] text-left transition-all cursor-pointer"
+        >
+          <b className="text-[22px] sm:text-[25px] font-['Manrope'] font-extrabold text-emerald-400 block">
+            {availableToolsCount}
+          </b>
+          <span className="block text-[#aeb5ad] text-[11px] mt-[2px] font-bold">
+            Available tools
+          </span>
+        </button>
+
+        <div className="bg-[#30352f] border border-[#41463f] rounded-[13px] p-[14px] text-left">
+          <b className="text-[20px] sm:text-[25px] font-['Manrope'] font-extrabold text-white block">
+            ₹{collectedToday}
+          </b>
+          <span className="block text-[#aeb5ad] text-[11px] mt-[2px] font-bold">
+            Collected today
+          </span>
+        </div>
+      </div>
+    </section>
   );
 };

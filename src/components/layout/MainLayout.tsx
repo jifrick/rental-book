@@ -1,5 +1,4 @@
 import React from 'react';
-import { Header } from './Header';
 import { MobileBottomNav } from './MobileBottomNav';
 import type { TabType } from './MobileBottomNav';
 import { DesktopSidebar } from './DesktopSidebar';
@@ -18,26 +17,22 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
   children,
 }) => {
   return (
-    <div className="min-h-screen bg-slate-100 flex flex-col font-sans text-slate-900">
-      {/* Header */}
-      <Header onOpenNewRental={onOpenNewRental} />
+    <div className="min-h-screen bg-[#eee9e1] text-[#20221f] flex">
+      {/* Fixed Desktop Sidebar */}
+      <DesktopSidebar
+        activeTab={activeTab}
+        onSelectTab={onSelectTab}
+        onOpenNewRental={onOpenNewRental}
+      />
 
-      {/* Body Area */}
-      <div className="flex-1 flex max-w-7xl w-full mx-auto">
-        {/* Sidebar for Desktop */}
-        <DesktopSidebar
-          activeTab={activeTab}
-          onSelectTab={onSelectTab}
-          onOpenNewRental={onOpenNewRental}
-        />
-
-        {/* Main Content Area */}
-        <main className="flex-1 p-3 sm:p-6 pb-24 md:pb-8 max-w-full overflow-x-hidden">
+      {/* Main Content Area */}
+      <main className="w-full md:ml-[252px] md:w-[calc(100%-252px)] p-[20px] sm:p-[28px_34px_50px] pb-[88px] md:pb-[50px]">
+        <div className="max-w-[1280px] mx-auto">
           {children}
-        </main>
-      </div>
+        </div>
+      </main>
 
-      {/* Bottom Nav for Mobile */}
+      {/* Mobile Fixed Bottom Nav */}
       <MobileBottomNav
         activeTab={activeTab}
         onSelectTab={onSelectTab}
