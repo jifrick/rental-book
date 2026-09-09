@@ -109,10 +109,18 @@ ALTER TABLE public.rental_items ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.payments ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.settings ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Allow authenticated read/write on categories" ON public.categories FOR ALL USING (auth.role() = 'authenticated');
-CREATE POLICY "Allow authenticated read/write on customers" ON public.customers FOR ALL USING (auth.role() = 'authenticated');
-CREATE POLICY "Allow authenticated read/write on tools" ON public.tools FOR ALL USING (auth.role() = 'authenticated');
-CREATE POLICY "Allow authenticated read/write on rentals" ON public.rentals FOR ALL USING (auth.role() = 'authenticated');
-CREATE POLICY "Allow authenticated read/write on rental_items" ON public.rental_items FOR ALL USING (auth.role() = 'authenticated');
-CREATE POLICY "Allow authenticated read/write on payments" ON public.payments FOR ALL USING (auth.role() = 'authenticated');
-CREATE POLICY "Allow authenticated read/write on settings" ON public.settings FOR ALL USING (auth.role() = 'authenticated');
+DROP POLICY IF EXISTS "Allow authenticated read/write on categories" ON public.categories;
+DROP POLICY IF EXISTS "Allow authenticated read/write on customers" ON public.customers;
+DROP POLICY IF EXISTS "Allow authenticated read/write on tools" ON public.tools;
+DROP POLICY IF EXISTS "Allow authenticated read/write on rentals" ON public.rentals;
+DROP POLICY IF EXISTS "Allow authenticated read/write on rental_items" ON public.rental_items;
+DROP POLICY IF EXISTS "Allow authenticated read/write on payments" ON public.payments;
+DROP POLICY IF EXISTS "Allow authenticated read/write on settings" ON public.settings;
+
+CREATE POLICY "Allow authenticated read/write on categories" ON public.categories FOR ALL USING (true);
+CREATE POLICY "Allow authenticated read/write on customers" ON public.customers FOR ALL USING (true);
+CREATE POLICY "Allow authenticated read/write on tools" ON public.tools FOR ALL USING (true);
+CREATE POLICY "Allow authenticated read/write on rentals" ON public.rentals FOR ALL USING (true);
+CREATE POLICY "Allow authenticated read/write on rental_items" ON public.rental_items FOR ALL USING (true);
+CREATE POLICY "Allow authenticated read/write on payments" ON public.payments FOR ALL USING (true);
+CREATE POLICY "Allow authenticated read/write on settings" ON public.settings FOR ALL USING (true);
