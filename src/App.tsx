@@ -4,6 +4,7 @@ import { MainLayout } from './components/layout/MainLayout';
 import type { TabType } from './components/layout/MobileBottomNav';
 import { Login } from './pages/Login';
 import { Dashboard } from './pages/Dashboard';
+import { RentalsPage } from './pages/RentalsPage';
 import { HistoryPage } from './pages/HistoryPage';
 import { ToolsPage } from './pages/ToolsPage';
 import { CustomersPage } from './pages/CustomersPage';
@@ -42,11 +43,12 @@ const MainAppContent: React.FC = () => {
           onOpenNewRental={() => setIsNewRentalOpen(true)}
           onOpenReturnTool={(rental) => setReturnToolRental(rental)}
           onOpenRentalDetails={(rental) => setActiveRentalDetails(rental)}
+          onSelectTab={setActiveTab}
         />
       )}
 
       {activeTab === 'rentals' && (
-        <Dashboard
+        <RentalsPage
           onOpenNewRental={() => setIsNewRentalOpen(true)}
           onOpenReturnTool={(rental) => setReturnToolRental(rental)}
           onOpenRentalDetails={(rental) => setActiveRentalDetails(rental)}
