@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import type { Rental } from '../types/database';
 import { getRentals, subscribeToStore } from '../lib/storageService';
+import { useAuth } from '../context/AuthContext';
 import { formatDateOnly, formatTimeOnly, calculateDuration } from '../lib/dateUtils';
 import { EmptyState } from '../components/shared/EmptyState';
 
@@ -9,13 +10,15 @@ interface HistoryPageProps {
 }
 
 export const HistoryPage: React.FC<HistoryPageProps> = ({ onOpenReceipt }) => {
-  const [rentals, setRentals] = useState<Rental[]>(() => getRentals());
+  const { currentShopId } = useAuth();
+  const [rentals, setRentals] = useState<Rental[]>(() => getRentals(currentShopId));
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'ACTIVE' | 'RETURNED'>('ALL');
 
   useEffect(() => {
-    return subscribeToStore(() => setRentals(getRentals()));
-  }, []);
+    setRentals(getRentals(currentShopId));
+    return subscribeToStore(() => setRentals(getRentals(currentShopId)));
+  }, [currentShopId]);
 
   const filteredRentals = useMemo(() => {
     return rentals.filter((r) => {

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Plus, RefreshCw } from 'lucide-react';
 import type { Rental } from '../types/database';
 import { getRentals, subscribeToStore } from '../lib/storageService';
+import { useAuth } from '../context/AuthContext';
 import { ActiveRentalCard } from '../components/dashboard/ActiveRentalCard';
 import { EmptyState } from '../components/shared/EmptyState';
 import { getOverdueInfo } from '../lib/dateUtils';
@@ -17,17 +18,19 @@ export const RentalsPage: React.FC<RentalsPageProps> = ({
   onOpenReturnTool,
   onOpenRentalDetails,
 }) => {
-  const [rentals, setRentals] = useState<Rental[]>(() => getRentals());
+  const { currentShopId } = useAuth();
+  const [rentals, setRentals] = useState<Rental[]>(() => getRentals(currentShopId));
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [subFilter, setSubFilter] = useState<'ALL' | 'DUE_TODAY' | 'OVERDUE'>('ALL');
 
   const refreshData = () => {
-    setRentals(getRentals());
+    setRentals(getRentals(currentShopId));
   };
 
   useEffect(() => {
+    refreshData();
     return subscribeToStore(refreshData);
-  }, []);
+  }, [currentShopId]);
 
   const activeRentals = useMemo(() => {
     return rentals.filter((r) => r.status === 'ACTIVE');

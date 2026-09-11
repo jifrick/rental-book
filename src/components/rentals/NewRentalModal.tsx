@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import type { Customer, Tool, Category } from '../../types/database';
 import { getCustomers, getTools, getCategories, addCustomer, createRental } from '../../lib/storageService';
+import { useAuth } from '../../context/AuthContext';
 import { formatDateTime } from '../../lib/dateUtils';
 
 interface NewRentalModalProps {
@@ -14,11 +15,12 @@ export const NewRentalModal: React.FC<NewRentalModalProps> = ({
   onClose,
   onSuccess,
 }) => {
+  const { currentShopId } = useAuth();
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
 
   // Data sources
-  const [customers, setCustomers] = useState<Customer[]>(() => getCustomers());
-  const [tools, setTools] = useState<Tool[]>(() => getTools());
+  const [customers, setCustomers] = useState<Customer[]>(() => getCustomers(currentShopId));
+  const [tools, setTools] = useState<Tool[]>(() => getTools(currentShopId));
   const [categories, setCategories] = useState<Category[]>(() => getCategories());
 
   // Form State
@@ -50,8 +52,8 @@ export const NewRentalModal: React.FC<NewRentalModalProps> = ({
   // Sync data and reset state when modal opens
   useEffect(() => {
     if (isOpen) {
-      setCustomers(getCustomers());
-      setTools(getTools());
+      setCustomers(getCustomers(currentShopId));
+      setTools(getTools(currentShopId));
       setCategories(getCategories());
       setStep(1);
       setSelectedCustomer(null);
@@ -67,7 +69,7 @@ export const NewRentalModal: React.FC<NewRentalModalProps> = ({
       setSelectedCategory('ALL');
       setCreatedRentalInfo(null);
     }
-  }, [isOpen]);
+  }, [isOpen, currentShopId]);
 
   // Filtered Customers
   const filteredCustomers = useMemo(() => {
@@ -130,8 +132,8 @@ export const NewRentalModal: React.FC<NewRentalModalProps> = ({
         name: newCustName.trim(),
         phone: newCustPhone.trim(),
         address: newCustAddress.trim(),
-      });
-      setCustomers(getCustomers());
+      }, currentShopId);
+      setCustomers(getCustomers(currentShopId));
       setSelectedCustomer(newCust);
       setIsAddingNewCustomer(false);
       setStep(2); // Proceed to Tool Selection
@@ -152,7 +154,7 @@ export const NewRentalModal: React.FC<NewRentalModalProps> = ({
       const rental = createRental({
         customer_id: selectedCustomer.id,
         tool_id: selectedTool.id,
-      });
+      }, currentShopId);
 
       setCreatedRentalInfo({
         code: rental.rental_code,

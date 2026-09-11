@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import type { Rental, ToolCondition, PaymentMethod, PaymentStatus } from '../../types/database';
 import { formatDateTime, calculateDuration } from '../../lib/dateUtils';
 import { completeReturn } from '../../lib/storageService';
+import { useAuth } from '../../context/AuthContext';
 
 interface ReturnToolModalProps {
   rental: Rental | null;
@@ -18,6 +19,7 @@ export const ReturnToolModal: React.FC<ReturnToolModalProps> = ({
   onSuccess,
   onOpenReceipt,
 }) => {
+  const { currentShopId } = useAuth();
   // Auto Return Time & Duration
   const [returnTimestamp, setReturnTimestamp] = useState<string>(new Date().toISOString());
 
@@ -38,6 +40,7 @@ export const ReturnToolModal: React.FC<ReturnToolModalProps> = ({
   useEffect(() => {
     if (isOpen && rental) {
       setReturnTimestamp(new Date().toISOString());
+      setStep(1);
       setCondition('GOOD');
       setRentalAmount('350');
       setLateFee('0');
@@ -45,8 +48,6 @@ export const ReturnToolModal: React.FC<ReturnToolModalProps> = ({
       setOtherFee('0');
       setPaymentMethod('CASH');
       setPaymentStatus('PAID');
-      setStep(1);
-      setCompletedRental(null);
     }
   }, [isOpen, rental]);
 
@@ -64,17 +65,21 @@ export const ReturnToolModal: React.FC<ReturnToolModalProps> = ({
   const handleCompleteReturn = (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const updated = completeReturn(rental.id, {
-        returned_at: returnTimestamp,
-        return_condition: condition,
-        rental_amount: numRent,
-        late_fee: numLate,
-        damage_fee: numDamage,
-        other_fee: numOther,
-        payment_method: paymentMethod,
-        payment_status: paymentStatus,
-        amount_paid: paymentStatus === 'PAID' ? totalSum : 0,
-      });
+      const updated = completeReturn(
+        rental.id,
+        {
+          returned_at: returnTimestamp,
+          return_condition: condition,
+          rental_amount: numRent,
+          late_fee: numLate,
+          damage_fee: numDamage,
+          other_fee: numOther,
+          payment_method: paymentMethod,
+          payment_status: paymentStatus,
+          amount_paid: paymentStatus === 'PAID' ? totalSum : 0,
+        },
+        currentShopId
+      );
 
       setCompletedRental(updated);
       onSuccess(updated);

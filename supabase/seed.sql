@@ -1,5 +1,18 @@
--- Tool Rental Record Book - Supabase PostgreSQL Seed SQL
+-- Multi-Tenant SaaS Seed SQL for Rental Book
 
+-- 1. SEED SHOPS
+INSERT INTO public.shops (id, name, owner_name, phone, address, user_id_code, status, is_onboarded, is_temp_password) VALUES
+  ('55555555-0001-4000-8000-000000000001', 'CK TOOLS', 'JAMAL CK', '9946052379', 'Main Road, Koolimadu, Kozhikode Kerala', 'CKTOOLS001', 'ACTIVE', true, false),
+  ('55555555-0002-4000-8000-000000000002', 'ABC TOOLS', 'RAHUL SHARMA', '9895000111', 'Station Road, Calicut', 'ABC001', 'ACTIVE', true, false)
+ON CONFLICT (user_id_code) DO NOTHING;
+
+-- 2. SEED SHOP SETTINGS
+INSERT INTO public.settings (id, shop_id, shop_name, owner_name, phone, address) VALUES
+  ('66666666-0001-4000-8000-000000000001', '55555555-0001-4000-8000-000000000001', 'CK TOOLS', 'JAMAL CK', '9946052379', 'Main Road, Koolimadu, Kozhikode Kerala'),
+  ('66666666-0002-4000-8000-000000000002', '55555555-0002-4000-8000-000000000002', 'ABC TOOLS', 'RAHUL SHARMA', '9895000111', 'Station Road, Calicut')
+ON CONFLICT (shop_id) DO NOTHING;
+
+-- 3. SEED CATEGORIES
 INSERT INTO public.categories (id, name, description) VALUES
   ('11111111-0001-4000-8000-000000000001', 'Drilling & Chipping', 'Electric drills, hammer drills, chipping machines'),
   ('11111111-0002-4000-8000-000000000002', 'Cutting & Grinding', 'Tile cutters, concrete cutters, angle grinders'),
@@ -7,61 +20,74 @@ INSERT INTO public.categories (id, name, description) VALUES
   ('11111111-0004-4000-8000-000000000004', 'Pumps & Motors', 'Water pumps, submersible pumps, motor pumps'),
   ('11111111-0005-4000-8000-000000000005', 'Welding & Electrical', 'Arc welding sets, generators, extension boards'),
   ('11111111-0006-4000-8000-000000000006', 'Construction & Lifting', 'Mixer machines, vibrators, ladders, jacks, scaffolding')
-ON CONFLICT (id) DO NOTHING;
+ON CONFLICT (name) DO NOTHING;
 
-INSERT INTO public.customers (id, name, phone, address, notes) VALUES
-  ('22222222-0001-4000-8000-000000000001', 'Afsal', '9847123456', 'Panamaram, Wayanad', 'Regular electrician contractor'),
-  ('22222222-0002-4000-8000-000000000002', 'Riyas', '9745987654', 'Kozhikode Town', 'House construction client'),
-  ('22222222-0003-4000-8000-000000000003', 'Nihad', '9633112233', 'Kunnamangalam', 'Plumber'),
-  ('22222222-0004-4000-8000-000000000004', 'Basheer', '9895443322', 'Kalpetta', 'Painter contractor')
-ON CONFLICT (phone) DO NOTHING;
+-- 4. SEED MASTER TOOLS (Platform Master Catalog)
+INSERT INTO public.master_tools (name, category_name, description) VALUES
+  ('Driller', 'Drilling & Chipping', 'Heavy duty electric drilling machine'),
+  ('Cutter', 'Cutting & Grinding', 'Concrete & wood cutter'),
+  ('Tile Cutter', 'Cutting & Grinding', 'Manual and electric tile cutter'),
+  ('Tile Hammer', 'Drilling & Chipping', 'Chipping tile hammer'),
+  ('Hammer', 'Drilling & Chipping', 'Standard hammer drill'),
+  ('Welding Set', 'Welding & Electrical', 'Portable arc welding set'),
+  ('Wall Polisher', 'Cutting & Grinding', 'Drywall wall sander & polisher'),
+  ('Belt Polisher', 'Cutting & Grinding', 'Belt sander polisher'),
+  ('Electric Saw', 'Cutting & Grinding', 'Circular electric saw'),
+  ('Vibrator', 'Construction & Lifting', 'Concrete needle vibrator'),
+  ('Water Pump', 'Pumps & Motors', 'High flow water pump'),
+  ('Dewatering Pump', 'Pumps & Motors', 'Submersible dewatering pump'),
+  ('Block Machine', 'Construction & Lifting', 'Concrete block making machine'),
+  ('Concrete Mixer', 'Construction & Lifting', 'Drum concrete mixer'),
+  ('Concrete Sheet', 'Construction & Lifting', 'Slab leveling concrete sheet'),
+  ('Measuring Meter', 'Construction & Lifting', 'Laser distance meter'),
+  ('Ladder', 'Construction & Lifting', 'Step ladder'),
+  ('Box', 'Construction & Lifting', 'Equipment carry box'),
+  ('Wheel Barrow', 'Construction & Lifting', 'Heavy duty wheelbarrow'),
+  ('1 Wheel Heavy', 'Construction & Lifting', '1 Wheel heavy trolley'),
+  ('2 Wheel', 'Construction & Lifting', '2 Wheel hand truck'),
+  ('Trolley', 'Construction & Lifting', 'Material transport trolley'),
+  ('Scaffold', 'Construction & Lifting', 'Steel scaffolding frame set'),
+  ('Aluminium Ladder', 'Construction & Lifting', 'Extension aluminium ladder'),
+  ('Jack', 'Construction & Lifting', 'Hydraulic bottle jack'),
+  ('Generator', 'Welding & Electrical', 'Diesel / petrol power generator'),
+  ('Compressor', 'Washing & Cleaning', 'Air compressor unit'),
+  ('Grinder', 'Cutting & Grinding', 'Angle grinder'),
+  ('Tile Cutting Machine', 'Cutting & Grinding', 'Wet tile table cutter'),
+  ('Fibre Kotta', 'Construction & Lifting', 'Fibre pan basket'),
+  ('Cable Machine', 'Welding & Electrical', 'Cable pulling machine'),
+  ('Spirit Level', 'Construction & Lifting', 'Precision spirit level'),
+  ('Welding Machine', 'Welding & Electrical', 'Inverter welding machine'),
+  ('Electrical Winch', 'Welding & Electrical', 'Electric power winch hoist'),
+  ('Safety Shoe', 'Construction & Lifting', 'Steel toe safety shoes'),
+  ('LED Light', 'Welding & Electrical', 'Portable LED work light'),
+  ('Flood Light', 'Welding & Electrical', 'High power halogen flood light'),
+  ('Lawn Mower', 'Washing & Cleaning', 'Grass cutting lawn mower'),
+  ('Water Hose', 'Pumps & Motors', 'Heavy duty water hose'),
+  ('Cutting Machine', 'Cutting & Grinding', 'Heavy industrial metal cutting machine'),
+  ('Cooler', 'Washing & Cleaning', 'Industrial air cooler'),
+  ('Soldering Iron', 'Welding & Electrical', 'Electric soldering station')
+ON CONFLICT (name) DO NOTHING;
 
-TRUNCATE TABLE public.tools CASCADE;
+-- 5. SEED CK TOOLS CUSTOMERS
+INSERT INTO public.customers (id, shop_id, name, phone, address, notes) VALUES
+  ('22222222-0001-4000-8000-000000000001', '55555555-0001-4000-8000-000000000001', 'Afsal', '9847123456', 'Panamaram, Wayanad', 'Regular electrician contractor'),
+  ('22222222-0002-4000-8000-000000000002', '55555555-0001-4000-8000-000000000001', 'Riyas', '9745987654', 'Kozhikode Town', 'House construction client')
+ON CONFLICT (shop_id, phone) DO NOTHING;
 
-INSERT INTO public.tools (id, name, category_id, tool_code, condition, status) VALUES
-  ('33333333-0001-4000-8000-000000000001', 'Driller', '11111111-0001-4000-8000-000000000001', 'DR-01', 'GOOD', 'AVAILABLE'),
-  ('33333333-0002-4000-8000-000000000002', 'Driller', '11111111-0001-4000-8000-000000000001', 'DR-02', 'GOOD', 'AVAILABLE'),
-  ('33333333-0003-4000-8000-000000000003', 'Cutter', '11111111-0002-4000-8000-000000000002', 'CUT-01', 'GOOD', 'AVAILABLE'),
-  ('33333333-0004-4000-8000-000000000004', 'Cutter', '11111111-0002-4000-8000-000000000002', 'CUT-02', 'GOOD', 'AVAILABLE'),
-  ('33333333-0005-4000-8000-000000000005', 'Tile Cutter', '11111111-0002-4000-8000-000000000002', 'TC-01', 'GOOD', 'AVAILABLE'),
-  ('33333333-0006-4000-8000-000000000006', 'Tile Hammer', '11111111-0001-4000-8000-000000000001', 'TH-01', 'GOOD', 'AVAILABLE'),
-  ('33333333-0007-4000-8000-000000000007', 'Hammer', '11111111-0001-4000-8000-000000000001', 'HM-01', 'GOOD', 'AVAILABLE'),
-  ('33333333-0008-4000-8000-000000000008', 'Welding Set', '11111111-0005-4000-8000-000000000005', 'WS-01', 'GOOD', 'AVAILABLE'),
-  ('33333333-0009-4000-8000-000000000009', 'Wall Polisher', '11111111-0002-4000-8000-000000000002', 'WPL-01', 'GOOD', 'AVAILABLE'),
-  ('33333333-0010-4000-8000-000000000010', 'Belt Polisher', '11111111-0002-4000-8000-000000000002', 'BP-01', 'GOOD', 'AVAILABLE'),
-  ('33333333-0011-4000-8000-000000000011', 'Electric Saw', '11111111-0002-4000-8000-000000000002', 'ES-01', 'GOOD', 'AVAILABLE'),
-  ('33333333-0012-4000-8000-000000000012', 'Vibrator', '11111111-0006-4000-8000-000000000006', 'VB-01', 'GOOD', 'AVAILABLE'),
-  ('33333333-0013-4000-8000-000000000013', 'Water Pump', '11111111-0004-4000-8000-000000000004', 'WP-01', 'GOOD', 'AVAILABLE'),
-  ('33333333-0014-4000-8000-000000000014', 'Dewatering Pump', '11111111-0004-4000-8000-000000000004', 'DWP-01', 'GOOD', 'AVAILABLE'),
-  ('33333333-0015-4000-8000-000000000015', 'Block Machine', '11111111-0006-4000-8000-000000000006', 'BM-01', 'GOOD', 'AVAILABLE'),
-  ('33333333-0016-4000-8000-000000000016', 'Concrete Mixer', '11111111-0006-4000-8000-000000000006', 'CM-01', 'GOOD', 'AVAILABLE'),
-  ('33333333-0017-4000-8000-000000000017', 'Concrete Sheet', '11111111-0006-4000-8000-000000000006', 'CS-01', 'GOOD', 'AVAILABLE'),
-  ('33333333-0018-4000-8000-000000000018', 'Measuring Meter', '11111111-0006-4000-8000-000000000006', 'MM-01', 'GOOD', 'AVAILABLE'),
-  ('33333333-0019-4000-8000-000000000019', 'Ladder', '11111111-0006-4000-8000-000000000006', 'LAD-01', 'GOOD', 'AVAILABLE'),
-  ('33333333-0020-4000-8000-000000000020', 'Box', '11111111-0006-4000-8000-000000000006', 'BX-01', 'GOOD', 'AVAILABLE'),
-  ('33333333-0021-4000-8000-000000000021', 'Wheel Barrow', '11111111-0006-4000-8000-000000000006', 'WB-01', 'GOOD', 'AVAILABLE'),
-  ('33333333-0022-4000-8000-000000000022', '1 Wheel Heavy', '11111111-0006-4000-8000-000000000006', '1WH-01', 'GOOD', 'AVAILABLE'),
-  ('33333333-0023-4000-8000-000000000023', '2 Wheel', '11111111-0006-4000-8000-000000000006', '2WH-01', 'GOOD', 'AVAILABLE'),
-  ('33333333-0024-4000-8000-000000000024', 'Trolley', '11111111-0006-4000-8000-000000000006', 'TR-01', 'GOOD', 'AVAILABLE'),
-  ('33333333-0025-4000-8000-000000000025', 'Scaffold', '11111111-0006-4000-8000-000000000006', 'SC-01', 'GOOD', 'AVAILABLE'),
-  ('33333333-0026-4000-8000-000000000026', 'Aluminium Ladder', '11111111-0006-4000-8000-000000000006', 'AL-01', 'GOOD', 'AVAILABLE'),
-  ('33333333-0027-4000-8000-000000000027', 'Jack', '11111111-0006-4000-8000-000000000006', 'JK-01', 'GOOD', 'AVAILABLE'),
-  ('33333333-0028-4000-8000-000000000028', 'Generator', '11111111-0005-4000-8000-000000000005', 'GEN-01', 'GOOD', 'AVAILABLE'),
-  ('33333333-0029-4000-8000-000000000029', 'Compressor', '11111111-0003-4000-8000-000000000003', 'CMP-01', 'GOOD', 'AVAILABLE'),
-  ('33333333-0030-4000-8000-000000000030', 'Fibre Kotta', '11111111-0006-4000-8000-000000000006', 'FK-01', 'GOOD', 'AVAILABLE'),
-  ('33333333-0031-4000-8000-000000000031', 'Cable Machine', '11111111-0005-4000-8000-000000000005', 'CBM-01', 'GOOD', 'AVAILABLE'),
-  ('33333333-0032-4000-8000-000000000032', 'Spirit Level', '11111111-0006-4000-8000-000000000006', 'SL-01', 'GOOD', 'AVAILABLE'),
-  ('33333333-0033-4000-8000-000000000033', 'Welding Machine', '11111111-0005-4000-8000-000000000005', 'WEL-01', 'GOOD', 'AVAILABLE'),
-  ('33333333-0034-4000-8000-000000000034', 'Electrical Winch', '11111111-0005-4000-8000-000000000005', 'EW-01', 'GOOD', 'AVAILABLE'),
-  ('33333333-0035-4000-8000-000000000035', 'Safety Shoe', '11111111-0006-4000-8000-000000000006', 'SS-01', 'GOOD', 'AVAILABLE'),
-  ('33333333-0036-4000-8000-000000000036', 'LED Light', '11111111-0005-4000-8000-000000000005', 'LED-01', 'GOOD', 'AVAILABLE'),
-  ('33333333-0037-4000-8000-000000000037', 'Flood Light', '11111111-0005-4000-8000-000000000005', 'FL-01', 'GOOD', 'AVAILABLE'),
-  ('33333333-0038-4000-8000-000000000038', 'Lawn Mower', '11111111-0003-4000-8000-000000000003', 'LM-01', 'GOOD', 'AVAILABLE'),
-  ('33333333-0039-4000-8000-000000000039', 'Water Hose', '11111111-0004-4000-8000-000000000004', 'HOSE-01', 'GOOD', 'AVAILABLE'),
-  ('33333333-0040-4000-8000-000000000040', 'Cutting Machine', '11111111-0002-4000-8000-000000000002', 'CM-CUT-01', 'GOOD', 'AVAILABLE'),
-  ('33333333-0041-4000-8000-000000000041', 'Cooler', '11111111-0003-4000-8000-000000000003', 'CLR-01', 'GOOD', 'AVAILABLE'),
-  ('33333333-0042-4000-8000-000000000042', 'Soldering Iron', '11111111-0005-4000-8000-000000000005', 'SI-01', 'GOOD', 'AVAILABLE'),
-  ('33333333-0043-4000-8000-000000000043', 'Grinder', '11111111-0002-4000-8000-000000000002', 'GR-01', 'GOOD', 'AVAILABLE'),
-  ('33333333-0044-4000-8000-000000000044', 'Grinder', '11111111-0002-4000-8000-000000000002', 'GR-02', 'GOOD', 'AVAILABLE'),
-  ('33333333-0045-4000-8000-000000000045', 'Tile Cutting Machine', '11111111-0002-4000-8000-000000000002', 'TCM-01', 'GOOD', 'AVAILABLE')
-ON CONFLICT (id) DO NOTHING;
+-- 6. SEED ABC TOOLS CUSTOMERS
+INSERT INTO public.customers (id, shop_id, name, phone, address, notes) VALUES
+  ('22222222-0003-4000-8000-000000000003', '55555555-0002-4000-8000-000000000002', 'Vikram Kumar', '9112233445', 'Mavoor Road, Calicut', 'Plumbing contractor')
+ON CONFLICT (shop_id, phone) DO NOTHING;
+
+-- 7. SEED CK TOOLS PHYSICAL MACHINES
+INSERT INTO public.tools (id, shop_id, name, category_id, tool_code, condition, status) VALUES
+  ('33333333-0001-4000-8000-000000000001', '55555555-0001-4000-8000-000000000001', 'Driller', '11111111-0001-4000-8000-000000000001', 'DR-01', 'GOOD', 'AVAILABLE'),
+  ('33333333-0002-4000-8000-000000000002', '55555555-0001-4000-8000-000000000001', 'Driller', '11111111-0001-4000-8000-000000000001', 'DR-02', 'GOOD', 'AVAILABLE'),
+  ('33333333-0003-4000-8000-000000000003', '55555555-0001-4000-8000-000000000001', 'Cutter', '11111111-0002-4000-8000-000000000002', 'CUT-01', 'GOOD', 'AVAILABLE')
+ON CONFLICT (shop_id, tool_code) DO NOTHING;
+
+-- 8. SEED ABC TOOLS PHYSICAL MACHINES
+INSERT INTO public.tools (id, shop_id, name, category_id, tool_code, condition, status) VALUES
+  ('33333333-0004-4000-8000-000000000004', '55555555-0002-4000-8000-000000000002', 'Drilling Machine', '11111111-0001-4000-8000-000000000001', 'DM-01', 'GOOD', 'AVAILABLE'),
+  ('33333333-0005-4000-8000-000000000005', '55555555-0002-4000-8000-000000000002', 'Water Pump', '11111111-0004-4000-8000-000000000004', 'WP-ABC-1', 'GOOD', 'AVAILABLE')
+ON CONFLICT (shop_id, tool_code) DO NOTHING;

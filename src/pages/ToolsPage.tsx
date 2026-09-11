@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Plus } from 'lucide-react';
 import type { Tool, Category, Rental } from '../types/database';
 import { getTools, getCategories, subscribeToStore } from '../lib/storageService';
+import { useAuth } from '../context/AuthContext';
 import { AddToolModal } from '../components/tools/AddToolModal';
 import { ToolDetailsModal } from '../components/tools/ToolDetailsModal';
 import { EmptyState } from '../components/shared/EmptyState';
@@ -11,7 +12,8 @@ interface ToolsPageProps {
 }
 
 export const ToolsPage: React.FC<ToolsPageProps> = ({ onReturnTool }) => {
-  const [tools, setTools] = useState<Tool[]>(() => getTools());
+  const { currentShopId } = useAuth();
+  const [tools, setTools] = useState<Tool[]>(() => getTools(currentShopId));
   const [categories] = useState<Category[]>(() => getCategories());
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
@@ -20,8 +22,9 @@ export const ToolsPage: React.FC<ToolsPageProps> = ({ onReturnTool }) => {
   const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
 
   useEffect(() => {
-    return subscribeToStore(() => setTools(getTools()));
-  }, []);
+    setTools(getTools(currentShopId));
+    return subscribeToStore(() => setTools(getTools(currentShopId)));
+  }, [currentShopId]);
 
   // Grouped Tools by Tool Name
   const groupedTools = useMemo(() => {

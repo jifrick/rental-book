@@ -1,5 +1,6 @@
 import React from 'react';
 import { History, Plus } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
 import { useShopSettings } from '../../hooks/useShopSettings';
 import { formatDateOnly } from '../../lib/dateUtils';
 
@@ -9,7 +10,8 @@ interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = ({ onOpenNewRental, onOpenHistory }) => {
-  const settings = useShopSettings();
+  const { currentShopId } = useAuth();
+  const settings = useShopSettings(currentShopId);
   const currentDateStr = formatDateOnly(new Date());
 
   return (

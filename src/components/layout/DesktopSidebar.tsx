@@ -15,8 +15,8 @@ export const DesktopSidebar: React.FC<DesktopSidebarProps> = ({
   onSelectTab,
   onOpenNewRental,
 }) => {
-  const { logout } = useAuth();
-  const settings = useShopSettings();
+  const { logout, currentShopId } = useAuth();
+  const settings = useShopSettings(currentShopId);
   const ownerInitial = settings.owner_name ? settings.owner_name.trim().charAt(0).toUpperCase() : 'S';
 
   const navItems = [

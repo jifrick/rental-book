@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import type { ShopSettings } from '../types/database';
 import { updateSettings } from '../lib/storageService';
 import { useShopSettings } from '../hooks/useShopSettings';
+import { useAuth } from '../context/AuthContext';
 
 export const SettingsPage: React.FC = () => {
-  const currentSettings = useShopSettings();
+  const { currentShopId } = useAuth();
+  const currentSettings = useShopSettings(currentShopId);
   const [settings, setSettings] = useState<ShopSettings>(currentSettings);
   const [savedSuccess, setSavedSuccess] = useState(false);
 
@@ -14,7 +16,7 @@ export const SettingsPage: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    updateSettings(settings);
+    updateSettings(settings, currentShopId);
     setSavedSuccess(true);
     setTimeout(() => setSavedSuccess(false), 3000);
   };

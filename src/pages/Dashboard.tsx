@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 
 import type { Rental, Tool } from '../types/database';
 import { getRentals, getTools, subscribeToStore } from '../lib/storageService';
+import { useAuth } from '../context/AuthContext';
 import { Header } from '../components/layout/Header';
 import { SummaryCards } from '../components/dashboard/SummaryCards';
 import { ActiveRentalCard } from '../components/dashboard/ActiveRentalCard';
@@ -20,18 +21,20 @@ export const Dashboard: React.FC<DashboardProps> = ({
   onOpenRentalDetails,
   onSelectTab,
 }) => {
-  const [rentals, setRentals] = useState<Rental[]>(() => getRentals());
-  const [tools, setTools] = useState<Tool[]>(() => getTools());
+  const { currentShopId } = useAuth();
+  const [rentals, setRentals] = useState<Rental[]>(() => getRentals(currentShopId));
+  const [tools, setTools] = useState<Tool[]>(() => getTools(currentShopId));
   const [toolSearch, setToolSearch] = useState<string>('');
 
   const refreshData = () => {
-    setRentals(getRentals());
-    setTools(getTools());
+    setRentals(getRentals(currentShopId));
+    setTools(getTools(currentShopId));
   };
 
   useEffect(() => {
+    refreshData();
     return subscribeToStore(refreshData);
-  }, []);
+  }, [currentShopId]);
 
   const activeRentals = rentals.filter((r) => r.status === 'ACTIVE');
 

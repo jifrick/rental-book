@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, UserPlus, ShieldAlert } from 'lucide-react';
 import { addCustomer } from '../../lib/storageService';
+import { useAuth } from '../../context/AuthContext';
 import type { Customer } from '../../types/database';
 
 interface AddCustomerModalProps {
@@ -14,6 +15,7 @@ export const AddCustomerModal: React.FC<AddCustomerModalProps> = ({
   onClose,
   onSuccess,
 }) => {
+  const { currentShopId } = useAuth();
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [address, setAddress] = useState('');
@@ -32,7 +34,7 @@ export const AddCustomerModal: React.FC<AddCustomerModalProps> = ({
         phone: phone.trim(),
         address: address.trim(),
         notes: notes.trim(),
-      });
+      }, currentShopId);
       onSuccess(created);
       onClose();
     } catch (err: unknown) {

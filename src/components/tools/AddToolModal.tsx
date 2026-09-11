@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, PlusCircle, ShieldAlert } from 'lucide-react';
 import { addTool, getCategories } from '../../lib/storageService';
+import { useAuth } from '../../context/AuthContext';
 import type { ToolCondition, ToolStatus } from '../../types/database';
 
 interface AddToolModalProps {
@@ -14,6 +15,7 @@ export const AddToolModal: React.FC<AddToolModalProps> = ({
   onClose,
   onSuccess,
 }) => {
+  const { currentShopId } = useAuth();
   const categories = getCategories();
 
   const [name, setName] = useState('');
@@ -45,7 +47,7 @@ export const AddToolModal: React.FC<AddToolModalProps> = ({
         description: description.trim(),
         condition,
         status,
-      });
+      }, currentShopId);
       onSuccess();
       onClose();
     } catch (err: unknown) {

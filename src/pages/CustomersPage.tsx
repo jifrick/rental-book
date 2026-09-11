@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Plus } from 'lucide-react';
 import type { Customer, Rental } from '../types/database';
 import { getCustomers, getRentals, subscribeToStore } from '../lib/storageService';
+import { useAuth } from '../context/AuthContext';
 import { CustomerProfileModal } from '../components/customers/CustomerProfileModal';
 import { AddCustomerModal } from '../components/customers/AddCustomerModal';
 import { EmptyState } from '../components/shared/EmptyState';
@@ -11,19 +12,23 @@ interface CustomersPageProps {
 }
 
 export const CustomersPage: React.FC<CustomersPageProps> = ({ onOpenReceipt }) => {
-  const [customers, setCustomers] = useState<Customer[]>(() => getCustomers());
-  const [rentals, setRentals] = useState<Rental[]>(() => getRentals());
+  const { currentShopId } = useAuth();
+  const [customers, setCustomers] = useState<Customer[]>(() => getCustomers(currentShopId));
+  const [rentals, setRentals] = useState<Rental[]>(() => getRentals(currentShopId));
 
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
+  const refreshData = () => {
+    setCustomers(getCustomers(currentShopId));
+    setRentals(getRentals(currentShopId));
+  };
+
   useEffect(() => {
-    return subscribeToStore(() => {
-      setCustomers(getCustomers());
-      setRentals(getRentals());
-    });
-  }, []);
+    refreshData();
+    return subscribeToStore(refreshData);
+  }, [currentShopId]);
 
   const filteredCustomers = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
