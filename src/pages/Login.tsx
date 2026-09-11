@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useShopSettings } from '../hooks/useShopSettings';
 
 export const Login: React.FC = () => {
   const { login } = useAuth();
+  const settings = useShopSettings();
   const [email, setEmail] = useState('owner@toolrental.com');
   const [password, setPassword] = useState('password123');
 
@@ -67,7 +69,7 @@ export const Login: React.FC = () => {
 
         <div className="pt-2 border-t border-[#ded9d0] text-center">
           <span className="text-[11px] font-bold text-[#74766f]">
-            Wayanaad Tool Rentals · Owner Portal
+            {settings.shop_name} · Owner Portal
           </span>
         </div>
       </div>

@@ -81,10 +81,10 @@ CREATE TABLE IF NOT EXISTS public.payments (
 -- 7. SETTINGS TABLE
 CREATE TABLE IF NOT EXISTS public.settings (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  shop_name TEXT DEFAULT 'Wayanaad Tool Rentals',
-  owner_name TEXT DEFAULT 'Moosa Ikka',
-  phone TEXT DEFAULT '9847012345',
-  address TEXT DEFAULT 'Panamaram, Wayanad, Kerala',
+  shop_name TEXT DEFAULT 'CK TOOLS',
+  owner_name TEXT DEFAULT 'JAMAL CK',
+  phone TEXT DEFAULT '9946052379',
+  address TEXT DEFAULT 'Main Road, Koolimadu, Kozhikode Kerala',
   currency TEXT DEFAULT '₹',
   timezone TEXT DEFAULT 'Asia/Kolkata',
   updated_at TIMESTAMPTZ DEFAULT NOW()

@@ -2,7 +2,7 @@ import React from 'react';
 import { Home, ClipboardList, Wrench, Users, History, Settings, LogOut, Plus } from 'lucide-react';
 import type { TabType } from './MobileBottomNav';
 import { useAuth } from '../../context/AuthContext';
-import { getSettings } from '../../lib/storageService';
+import { useShopSettings } from '../../hooks/useShopSettings';
 
 interface DesktopSidebarProps {
   activeTab: TabType;
@@ -15,8 +15,9 @@ export const DesktopSidebar: React.FC<DesktopSidebarProps> = ({
   onSelectTab,
   onOpenNewRental,
 }) => {
-  const { user, logout } = useAuth();
-  const settings = getSettings();
+  const { logout } = useAuth();
+  const settings = useShopSettings();
+  const ownerInitial = settings.owner_name ? settings.owner_name.trim().charAt(0).toUpperCase() : 'S';
 
   const navItems = [
     { id: 'home', label: 'Dashboard', icon: Home },
@@ -93,11 +94,11 @@ export const DesktopSidebar: React.FC<DesktopSidebarProps> = ({
       <div className="border-t border-[#3a3f39] pt-[16px] flex items-center justify-between gap-[10px]">
         <div className="flex items-center gap-[10px] min-w-0">
           <div className="w-[38px] h-[38px] rounded-full bg-[#e2ddd4] text-[#34362f] grid place-items-center font-extrabold text-sm shrink-0">
-            {user?.name?.charAt(0) || 'M'}
+            {ownerInitial}
           </div>
           <div className="min-w-0">
             <b className="block text-sm text-white font-['Manrope'] truncate">
-              {user?.name || 'Moosa'}
+              {settings.owner_name}
             </b>
             <small className="block text-[#9fa59e] text-[11px] mt-[2px] truncate">
               Shop owner

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import type { Customer, Tool, Category } from '../../types/database';
 import { getCustomers, getTools, getCategories, addCustomer, createRental } from '../../lib/storageService';
 import { formatDateTime } from '../../lib/dateUtils';
@@ -18,8 +18,8 @@ export const NewRentalModal: React.FC<NewRentalModalProps> = ({
 
   // Data sources
   const [customers, setCustomers] = useState<Customer[]>(() => getCustomers());
-  const [tools] = useState<Tool[]>(() => getTools());
-  const [categories] = useState<Category[]>(() => getCategories());
+  const [tools, setTools] = useState<Tool[]>(() => getTools());
+  const [categories, setCategories] = useState<Category[]>(() => getCategories());
 
   // Form State
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
@@ -47,7 +47,27 @@ export const NewRentalModal: React.FC<NewRentalModalProps> = ({
     startedAt: string;
   } | null>(null);
 
-  if (!isOpen) return null;
+  // Sync data and reset state when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setCustomers(getCustomers());
+      setTools(getTools());
+      setCategories(getCategories());
+      setStep(1);
+      setSelectedCustomer(null);
+      setSelectedToolName('');
+      setSelectedTool(null);
+      setIsAddingNewCustomer(false);
+      setNewCustName('');
+      setNewCustPhone('');
+      setNewCustAddress('');
+      setCustError('');
+      setCustSearch('');
+      setToolSearch('');
+      setSelectedCategory('ALL');
+      setCreatedRentalInfo(null);
+    }
+  }, [isOpen]);
 
   // Filtered Customers
   const filteredCustomers = useMemo(() => {
@@ -93,6 +113,8 @@ export const NewRentalModal: React.FC<NewRentalModalProps> = ({
     if (!selectedToolName) return [];
     return tools.filter((t) => t.name === selectedToolName);
   }, [tools, selectedToolName]);
+
+  if (!isOpen) return null;
 
   // Handle Add Customer submit
   const handleCreateCustomerSubmit = (e: React.FormEvent) => {

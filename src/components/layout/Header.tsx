@@ -1,7 +1,6 @@
 import React from 'react';
 import { History, Plus } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
-import { getSettings } from '../../lib/storageService';
+import { useShopSettings } from '../../hooks/useShopSettings';
 import { formatDateOnly } from '../../lib/dateUtils';
 
 interface HeaderProps {
@@ -10,19 +9,17 @@ interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = ({ onOpenNewRental, onOpenHistory }) => {
-  const { user } = useAuth();
-  const settings = getSettings();
-  const ownerName = user?.name || 'Moosa';
+  const settings = useShopSettings();
   const currentDateStr = formatDateOnly(new Date());
 
   return (
     <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-2">
       <div>
         <h1 className="font-['Manrope'] text-[24px] sm:text-[29px] font-extrabold tracking-[-1px] text-[#20221f] m-0">
-          Good day, <span className="text-[#d35d2f]">{ownerName}</span>
+          Good day, <span className="text-[#d35d2f]">{settings.owner_name}</span>
         </h1>
         <div className="text-[#74766f] text-[13px] mt-[5px] font-medium">
-          {currentDateStr} · {settings.address || 'Kozhikode, Kerala'}
+          {currentDateStr} · {settings.address}
         </div>
       </div>
 

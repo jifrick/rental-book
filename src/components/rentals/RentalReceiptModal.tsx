@@ -1,7 +1,7 @@
 import React from 'react';
 import type { Rental } from '../../types/database';
 import { formatDateTime, calculateDuration } from '../../lib/dateUtils';
-import { getSettings } from '../../lib/storageService';
+import { useShopSettings } from '../../hooks/useShopSettings';
 
 interface RentalReceiptModalProps {
   rental: Rental | null;
@@ -14,9 +14,9 @@ export const RentalReceiptModal: React.FC<RentalReceiptModalProps> = ({
   isOpen,
   onClose,
 }) => {
+  const settings = useShopSettings();
   if (!isOpen || !rental) return null;
 
-  const settings = getSettings();
   const duration = calculateDuration(rental.started_at, rental.returned_at);
 
   const handlePrint = () => {

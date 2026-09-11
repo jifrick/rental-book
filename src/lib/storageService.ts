@@ -6,7 +6,7 @@ const STORAGE_KEYS = {
   SETTINGS: 'tool_rental_settings_v1',
   CATEGORIES: 'tool_rental_categories_v1',
   CUSTOMERS: 'tool_rental_customers_v1',
-  TOOLS: 'tool_rental_tools_v1',
+  TOOLS: 'tool_rental_tools_v2',
   RENTALS: 'tool_rental_rentals_v1',
 };
 
@@ -54,6 +54,16 @@ export function initializeStorage() {
   getLocalItem(STORAGE_KEYS.CUSTOMERS, INITIAL_CUSTOMERS);
   getLocalItem(STORAGE_KEYS.TOOLS, INITIAL_TOOLS);
   getLocalItem(STORAGE_KEYS.RENTALS, INITIAL_RENTALS);
+
+  if (isSupabaseConfigured) {
+    Promise.resolve(
+      supabase.from('settings').select('*').limit(1)
+    ).then(({ data, error }) => {
+      if (!error && data && data.length > 0) {
+        setLocalItem(STORAGE_KEYS.SETTINGS, data[0]);
+      }
+    }).catch(console.error);
+  }
 }
 
 // Ensure init
@@ -68,6 +78,13 @@ export function updateSettings(updates: Partial<ShopSettings>): ShopSettings {
   const current = getSettings();
   const updated: ShopSettings = { ...current, ...updates, updated_at: new Date().toISOString() };
   setLocalItem(STORAGE_KEYS.SETTINGS, updated);
+
+  if (isSupabaseConfigured) {
+    Promise.resolve(
+      supabase.from('settings').upsert([updated])
+    ).catch(console.error);
+  }
+
   return updated;
 }
 

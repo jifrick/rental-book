@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState } from 'react';
+import { useShopSettings } from '../hooks/useShopSettings';
 
 interface AuthUser {
   email: string;
@@ -18,41 +19,32 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 const AUTH_STORAGE_KEY = 'tool_rental_auth_session_v1';
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<AuthUser | null>(() => {
-    try {
-      const saved = localStorage.getItem(AUTH_STORAGE_KEY);
-      return saved ? JSON.parse(saved) : {
-        email: 'owner@toolrental.com',
-        name: 'Moosa Ikka',
-        shopName: 'Wayanaad Tool Rentals',
-      };
-    } catch {
-      return {
-        email: 'owner@toolrental.com',
-        name: 'Moosa Ikka',
-        shopName: 'Wayanaad Tool Rentals',
-      };
-    }
+  const settings = useShopSettings();
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
+    return Boolean(localStorage.getItem(AUTH_STORAGE_KEY));
   });
 
   const login = (email: string, _pass: string) => {
-    const newUser: AuthUser = {
-      email,
-      name: 'Moosa Ikka',
-      shopName: 'Wayanaad Tool Rentals',
-    };
-    setUser(newUser);
-    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(newUser));
+    setIsAuthenticated(true);
+    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify({ email }));
     return true;
   };
 
   const logout = () => {
-    setUser(null);
+    setIsAuthenticated(false);
     localStorage.removeItem(AUTH_STORAGE_KEY);
   };
 
+  const user: AuthUser | null = isAuthenticated
+    ? {
+        email: 'owner@toolrental.com',
+        name: settings.owner_name,
+        shopName: settings.shop_name,
+      }
+    : null;
+
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated: Boolean(user), login, logout }}>
+    <AuthContext.Provider value={{ user, isAuthenticated, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

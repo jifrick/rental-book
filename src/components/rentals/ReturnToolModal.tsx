@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { Rental, ToolCondition, PaymentMethod, PaymentStatus } from '../../types/database';
 import { formatDateTime, calculateDuration } from '../../lib/dateUtils';
 import { completeReturn } from '../../lib/storageService';
@@ -18,11 +18,8 @@ export const ReturnToolModal: React.FC<ReturnToolModalProps> = ({
   onSuccess,
   onOpenReceipt,
 }) => {
-  if (!isOpen || !rental) return null;
-
   // Auto Return Time & Duration
-  const [returnTimestamp] = useState<string>(new Date().toISOString());
-  const duration = calculateDuration(rental.started_at, returnTimestamp);
+  const [returnTimestamp, setReturnTimestamp] = useState<string>(new Date().toISOString());
 
   // Return Form State
   const [condition, setCondition] = useState<ToolCondition>('GOOD');
@@ -37,6 +34,25 @@ export const ReturnToolModal: React.FC<ReturnToolModalProps> = ({
 
   const [step, setStep] = useState<1 | 2>(1);
   const [completedRental, setCompletedRental] = useState<Rental | null>(null);
+
+  useEffect(() => {
+    if (isOpen && rental) {
+      setReturnTimestamp(new Date().toISOString());
+      setCondition('GOOD');
+      setRentalAmount('350');
+      setLateFee('0');
+      setDamageFee('0');
+      setOtherFee('0');
+      setPaymentMethod('CASH');
+      setPaymentStatus('PAID');
+      setStep(1);
+      setCompletedRental(null);
+    }
+  }, [isOpen, rental]);
+
+  if (!isOpen || !rental) return null;
+
+  const duration = calculateDuration(rental.started_at, returnTimestamp);
 
   // Calculated total sum
   const numRent = parseFloat(rentalAmount) || 0;

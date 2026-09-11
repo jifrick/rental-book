@@ -1,10 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { ShopSettings } from '../types/database';
-import { getSettings, updateSettings } from '../lib/storageService';
+import { updateSettings } from '../lib/storageService';
+import { useShopSettings } from '../hooks/useShopSettings';
 
 export const SettingsPage: React.FC = () => {
-  const [settings, setSettings] = useState<ShopSettings>(() => getSettings());
+  const currentSettings = useShopSettings();
+  const [settings, setSettings] = useState<ShopSettings>(currentSettings);
   const [savedSuccess, setSavedSuccess] = useState(false);
+
+  useEffect(() => {
+    setSettings(currentSettings);
+  }, [currentSettings]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
