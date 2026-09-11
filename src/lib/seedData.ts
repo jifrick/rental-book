@@ -12,12 +12,12 @@ export const INITIAL_SETTINGS: ShopSettings = {
 };
 
 export const INITIAL_CATEGORIES: Category[] = [
-  { id: 'cat-drilling', name: 'Drilling & Chipping', description: 'Electric drills, hammer drills, chipping machines', created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
-  { id: 'cat-cutting', name: 'Cutting & Grinding', description: 'Tile cutters, concrete cutters, angle grinders', created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
-  { id: 'cat-cleaning', name: 'Washing & Cleaning', description: 'Car washers, high pressure washers, blowers', created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
-  { id: 'cat-pumps', name: 'Pumps & Motors', description: 'Water pumps, submersible pumps, motor pumps', created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
-  { id: 'cat-welding', name: 'Welding & Electrical', description: 'Arc welding sets, generators, extension boards', created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
-  { id: 'cat-construction', name: 'Construction & Lifting', description: 'Mixer machines, vibrators, ladders, jacks, scaffolding', created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: '11111111-0001-4000-8000-000000000001', name: 'Drilling & Chipping', description: 'Electric drills, hammer drills, chipping machines', created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: '11111111-0002-4000-8000-000000000002', name: 'Cutting & Grinding', description: 'Tile cutters, concrete cutters, angle grinders', created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: '11111111-0003-4000-8000-000000000003', name: 'Washing & Cleaning', description: 'Car washers, high pressure washers, blowers', created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: '11111111-0004-4000-8000-000000000004', name: 'Pumps & Motors', description: 'Water pumps, submersible pumps, motor pumps', created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: '11111111-0005-4000-8000-000000000005', name: 'Welding & Electrical', description: 'Arc welding sets, generators, extension boards', created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: '11111111-0006-4000-8000-000000000006', name: 'Construction & Lifting', description: 'Mixer machines, vibrators, ladders, jacks, scaffolding', created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
 ];
 
 export const INITIAL_CUSTOMERS: Customer[] = [

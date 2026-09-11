@@ -63,6 +63,35 @@ export function initializeStorage() {
         setLocalItem(STORAGE_KEYS.SETTINGS, data[0]);
       }
     }).catch(console.error);
+
+    Promise.resolve(
+      supabase.from('tools').select('*')
+    ).then(({ data, error }) => {
+      if (!error && data && data.length > 0) {
+        const categories = getCategories();
+        const catMap = new Map(categories.map((c) => [c.id, c.name]));
+
+        const remoteTools: Tool[] = data.map((t: any) => ({
+          id: t.id,
+          name: t.name,
+          category_id: t.category_id || '',
+          category_name: catMap.get(t.category_id) || 'General Equipment',
+          tool_code: t.tool_code,
+          description: t.description || '',
+          condition: t.condition || 'GOOD',
+          status: t.status || 'AVAILABLE',
+          created_at: t.created_at || new Date().toISOString(),
+          updated_at: t.updated_at || new Date().toISOString(),
+        }));
+
+        const localTools = getTools();
+        const mergedMap = new Map<string, Tool>();
+        localTools.forEach((t) => mergedMap.set(t.tool_code, t));
+        remoteTools.forEach((t) => mergedMap.set(t.tool_code, t));
+
+        setLocalItem(STORAGE_KEYS.TOOLS, Array.from(mergedMap.values()));
+      }
+    }).catch(console.error);
   }
 }
 
@@ -162,10 +191,17 @@ export function addTool(data: Omit<Tool, 'id' | 'created_at' | 'updated_at'>): T
     throw new Error(`Tool with code "${codeFormatted}" already exists (${existing.name}).`);
   }
 
+  const toolId = typeof crypto !== 'undefined' && crypto.randomUUID
+    ? crypto.randomUUID()
+    : `33333333-${Date.now().toString().slice(-4)}-4000-8000-${Math.floor(Math.random()*1e12).toString().padStart(12, '0')}`;
+
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(data.category_id || '');
+  const categoryIdToSave = isUuid ? data.category_id : null;
+
   const newTool: Tool = {
     ...data,
     tool_code: codeFormatted,
-    id: `tool-${Date.now()}`,
+    id: toolId,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   };
@@ -174,7 +210,27 @@ export function addTool(data: Omit<Tool, 'id' | 'created_at' | 'updated_at'>): T
   setLocalItem(STORAGE_KEYS.TOOLS, updatedList);
 
   if (isSupabaseConfigured) {
-    Promise.resolve(supabase.from('tools').insert([newTool])).catch(console.error);
+    const supabasePayload = {
+      id: newTool.id,
+      name: newTool.name,
+      category_id: categoryIdToSave,
+      tool_code: newTool.tool_code,
+      description: newTool.description || '',
+      condition: newTool.condition || 'GOOD',
+      status: newTool.status || 'AVAILABLE',
+      created_at: newTool.created_at,
+      updated_at: newTool.updated_at,
+    };
+
+    Promise.resolve(
+      supabase.from('tools').insert([supabasePayload])
+    ).then(({ error }) => {
+      if (error) {
+        console.error('Error inserting tool to Supabase:', error);
+      } else {
+        console.log('Tool successfully saved to Supabase! ✓');
+      }
+    }).catch(console.error);
   }
 
   return newTool;
