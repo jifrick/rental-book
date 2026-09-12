@@ -78,7 +78,7 @@ export const AddCustomerModal: React.FC<AddCustomerModalProps> = ({
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. Afsal"
+              placeholder="e.g. Customer Name"
               className="w-full px-4 py-3 rounded-xl border-2 border-slate-300 font-bold text-slate-900 text-base"
             />
           </div>

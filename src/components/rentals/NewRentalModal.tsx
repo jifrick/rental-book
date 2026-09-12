@@ -266,7 +266,7 @@ export const NewRentalModal: React.FC<NewRentalModalProps> = ({
                       className="w-full h-[42px] border border-[#ded9d0] bg-white rounded-[9px] px-3 font-medium text-sm"
                       value={newCustName}
                       onChange={(e) => setNewCustName(e.target.value)}
-                      placeholder="e.g. Afsal"
+                      placeholder="e.g. Customer Name"
                     />
                   </div>
 

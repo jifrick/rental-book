@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useMemo } from 'react';
 
 import type { Rental, Tool } from '../types/database';
-import { getRentals, getTools, subscribeToStore } from '../lib/storageService';
+import { getRentals, getTools, getCustomers, subscribeToStore } from '../lib/storageService';
 import { useAuth } from '../context/AuthContext';
 import { Header } from '../components/layout/Header';
 import { SummaryCards } from '../components/dashboard/SummaryCards';
 import { ActiveRentalCard } from '../components/dashboard/ActiveRentalCard';
 import { EmptyState } from '../components/shared/EmptyState';
+import { getOverdueInfo } from '../lib/dateUtils';
 
 interface DashboardProps {
   onOpenNewRental: () => void;
@@ -24,11 +25,13 @@ export const Dashboard: React.FC<DashboardProps> = ({
   const { currentShopId } = useAuth();
   const [rentals, setRentals] = useState<Rental[]>(() => getRentals(currentShopId));
   const [tools, setTools] = useState<Tool[]>(() => getTools(currentShopId));
+  const [customerCount, setCustomerCount] = useState<number>(() => getCustomers(currentShopId).length);
   const [toolSearch, setToolSearch] = useState<string>('');
 
   const refreshData = () => {
     setRentals(getRentals(currentShopId));
     setTools(getTools(currentShopId));
+    setCustomerCount(getCustomers(currentShopId).length);
   };
 
   useEffect(() => {
@@ -64,9 +67,23 @@ export const Dashboard: React.FC<DashboardProps> = ({
   }, [groupedTools, toolSearch]);
 
   const todayStr = new Date().toDateString();
+
+  const dueTodayCount = activeRentals.filter((r) => {
+    if (!r.expected_return_at) return false;
+    return new Date(r.expected_return_at).toDateString() === todayStr;
+  }).length;
+
+  const overdueCount = activeRentals.filter((r) => getOverdueInfo(r.expected_return_at, r.status).isOverdue).length;
+
   const returnedTodayCount = rentals.filter(
     (r) => r.status === 'RETURNED' && r.returned_at && new Date(r.returned_at).toDateString() === todayStr
   ).length;
+
+  const todayActivityCount = rentals.filter((r) => {
+    const started = new Date(r.started_at).toDateString() === todayStr;
+    const returned = r.returned_at && new Date(r.returned_at).toDateString() === todayStr;
+    return started || returned;
+  }).length;
 
   return (
     <div className="space-y-6">
@@ -136,10 +153,12 @@ export const Dashboard: React.FC<DashboardProps> = ({
                   </div>
                   <div>
                     <b className="text-[14px] text-[#20221f] block font-bold">Due today</b>
-                    <small className="block text-[#74766f] text-[10px] mt-[2px]">1 tool expected back</small>
+                    <small className="block text-[#74766f] text-[10px] mt-[2px]">
+                      {dueTodayCount === 0 ? 'No tools expected back today' : `${dueTodayCount} tool${dueTodayCount === 1 ? '' : 's'} expected back`}
+                    </small>
                   </div>
                 </div>
-                <strong className="font-['Manrope'] text-[19px] font-extrabold text-[#20221f]">1</strong>
+                <strong className="font-['Manrope'] text-[19px] font-extrabold text-[#20221f]">{dueTodayCount}</strong>
               </div>
 
               <div className="flex items-center justify-between p-[13px] rounded-[12px] bg-[#f6f3ed] border border-[#ded9d0]">
@@ -149,10 +168,12 @@ export const Dashboard: React.FC<DashboardProps> = ({
                   </div>
                   <div>
                     <b className="text-[14px] text-[#20221f] block font-bold">Overdue</b>
-                    <small className="block text-[#74766f] text-[10px] mt-[2px]">No overdue tools</small>
+                    <small className="block text-[#74766f] text-[10px] mt-[2px]">
+                      {overdueCount === 0 ? 'No overdue tools' : `${overdueCount} tool${overdueCount === 1 ? '' : 's'} overdue`}
+                    </small>
                   </div>
                 </div>
-                <strong className="font-['Manrope'] text-[19px] font-extrabold text-[#20221f]">0</strong>
+                <strong className="font-['Manrope'] text-[19px] font-extrabold text-[#20221f]">{overdueCount}</strong>
               </div>
 
               <div className="flex items-center justify-between p-[13px] rounded-[12px] bg-[#f6f3ed] border border-[#ded9d0]">
@@ -180,42 +201,57 @@ export const Dashboard: React.FC<DashboardProps> = ({
             </div>
 
             <div className="p-[0_15px_16px]">
-              <input
-                className="h-[42px] border border-[#ded9d0] bg-white rounded-[10px] w-full px-[12px] outline-hidden mb-[10px] text-xs font-bold my-3"
-                placeholder="Search tool..."
-                value={toolSearch}
-                onChange={(e) => setToolSearch(e.target.value)}
-              />
+              {tools.length === 0 ? (
+                <div className="p-6 text-center text-xs text-[#74766f]">
+                  <p className="font-bold mb-1.5 text-[#20221f]">No physical machines added yet</p>
+                  <p className="text-[11px] mb-3">Add machines to your shop inventory to track availability.</p>
+                  <button
+                    onClick={() => onSelectTab && onSelectTab('tools')}
+                    className="px-3 py-1.5 bg-[#d35d2f] hover:bg-[#c25227] text-white font-extrabold rounded-[9px] text-xs transition-all border-0"
+                  >
+                    ＋ Add Machine
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <input
+                    className="h-[42px] border border-[#ded9d0] bg-white rounded-[10px] w-full px-[12px] outline-hidden mb-[10px] text-xs font-bold my-3"
+                    placeholder="Search tool..."
+                    value={toolSearch}
+                    onChange={(e) => setToolSearch(e.target.value)}
+                  />
 
-              <div className="space-y-1">
-                {filteredToolsAtGlance.slice(0, 5).map((gt) => (
-                  <div key={gt.name} className="flex items-center justify-between py-[12px] px-[4px] border-b border-[#eeeae4] text-xs">
-                    <div className="flex items-center gap-[10px]">
-                      <div className="w-[35px] h-[35px] rounded-[9px] bg-[#eeeae3] grid place-items-center text-[16px] font-bold text-[#d35d2f]">
-                        ⚒
-                      </div>
-                      <div>
-                        <b className="text-[13px] text-[#20221f] block font-extrabold">{gt.name}</b>
-                        <small className="block text-[#74766f] text-[10px] mt-[2px] font-bold">{gt.total} machines</small>
-                      </div>
-                    </div>
+                  <div className="space-y-1">
+                    {filteredToolsAtGlance.slice(0, 5).map((gt) => (
+                      <div key={gt.name} className="flex items-center justify-between py-[12px] px-[4px] border-b border-[#eeeae4] text-xs">
+                        <div className="flex items-center gap-[10px]">
+                          <div className="w-[35px] h-[35px] rounded-[9px] bg-[#eeeae3] grid place-items-center text-[16px] font-bold text-[#d35d2f]">
+                            ⚒
+                          </div>
+                          <div>
+                            <b className="text-[13px] text-[#20221f] block font-extrabold">{gt.name}</b>
+                            <small className="block text-[#74766f] text-[10px] mt-[2px] font-bold">{gt.total} machines</small>
+                          </div>
+                        </div>
 
-                    <div className="flex items-center gap-3">
-                      <div className="flex gap-[4px]">
-                        {Array.from({ length: Math.min(gt.total, 4) }).map((_, i) => (
-                          <i
-                            key={i}
-                            className={`w-[8px] h-[8px] rounded-full inline-block ${
-                              i < (gt.total - gt.available) ? 'bg-[#d35d2f]' : 'bg-[#d8ddd8]'
-                            }`}
-                          />
-                        ))}
+                        <div className="flex items-center gap-3">
+                          <div className="flex gap-[4px]">
+                            {Array.from({ length: Math.min(gt.total, 4) }).map((_, i) => (
+                              <i
+                                key={i}
+                                className={`w-[8px] h-[8px] rounded-full inline-block ${
+                                  i < (gt.total - gt.available) ? 'bg-[#d35d2f]' : 'bg-[#d8ddd8]'
+                                }`}
+                              />
+                            ))}
+                          </div>
+                          <span className="text-[11px] text-[#74766f] font-bold">{gt.available} free</span>
+                        </div>
                       </div>
-                      <span className="text-[11px] text-[#74766f] font-bold">{gt.available} free</span>
-                    </div>
+                    ))}
                   </div>
-                ))}
-              </div>
+                </>
+              )}
             </div>
           </section>
         </div>
@@ -225,12 +261,12 @@ export const Dashboard: React.FC<DashboardProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-3 gap-[18px] mt-[18px]">
         <section className="bg-[#fdfcf9] border border-[#ded9d0] rounded-[17px] p-[19px] shadow-[0_14px_40px_rgba(43,37,28,0.09)]">
           <h3 className="font-['Manrope'] text-[16px] font-extrabold text-[#20221f] m-0">Rental activity</h3>
-          <p className="text-[12px] text-[#74766f] line-height-[1.5] mt-1">Today's completed rentals</p>
+          <p className="text-[12px] text-[#74766f] line-height-[1.5] mt-1">Today's completed & active rentals</p>
           <div className="font-['Manrope'] text-[30px] font-extrabold mt-[13px] text-[#20221f]">
-            {rentals.length} <span className="text-[13px] text-[#74766f] font-normal font-sans">records</span>
+            {todayActivityCount} <span className="text-[13px] text-[#74766f] font-normal font-sans">records today</span>
           </div>
           <div className="h-[7px] rounded-[10px] bg-[#e7e4dd] overflow-hidden mt-[12px]">
-            <i className="block w-[72%] h-full bg-[#d35d2f] rounded-[10px]" />
+            <i className={`block h-full bg-[#d35d2f] rounded-[10px] ${todayActivityCount > 0 ? 'w-[72%]' : 'w-[0%]'}`} />
           </div>
           <button
             onClick={() => onSelectTab && onSelectTab('history')}
@@ -244,7 +280,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
           <h3 className="font-['Manrope'] text-[16px] font-extrabold text-[#20221f] m-0">Customer book</h3>
           <p className="text-[12px] text-[#74766f] line-height-[1.5] mt-1">Search anyone who has rented before.</p>
           <div className="font-['Manrope'] text-[30px] font-extrabold mt-[13px] text-[#20221f]">
-            126 <span className="text-[13px] text-[#74766f] font-normal font-sans">customers</span>
+            {customerCount} <span className="text-[13px] text-[#74766f] font-normal font-sans">customers</span>
           </div>
           <button
             onClick={() => onSelectTab && onSelectTab('customers')}

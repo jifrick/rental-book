@@ -53,9 +53,19 @@ export function initializeStorage() {
   getLocalItem(STORAGE_KEYS.MASTER_TOOLS, INITIAL_MASTER_TOOLS);
   getLocalItem(STORAGE_KEYS.SETTINGS, [INITIAL_SETTINGS]);
   getLocalItem(STORAGE_KEYS.CATEGORIES, INITIAL_CATEGORIES);
-  getLocalItem(STORAGE_KEYS.CUSTOMERS, INITIAL_CUSTOMERS);
-  getLocalItem(STORAGE_KEYS.TOOLS, INITIAL_TOOLS);
-  getLocalItem(STORAGE_KEYS.RENTALS, INITIAL_RENTALS);
+
+  // Purge legacy demo items from local storage if present
+  const customers = getLocalItem<Customer[]>(STORAGE_KEYS.CUSTOMERS, []);
+  const cleanCustomers = customers.filter(c => !c.id.startsWith('cust-00'));
+  setLocalItem(STORAGE_KEYS.CUSTOMERS, cleanCustomers);
+
+  const tools = getLocalItem<Tool[]>(STORAGE_KEYS.TOOLS, []);
+  const cleanTools = tools.filter(t => !t.id.startsWith('33333333-0001'));
+  setLocalItem(STORAGE_KEYS.TOOLS, cleanTools);
+
+  const rentals = getLocalItem<Rental[]>(STORAGE_KEYS.RENTALS, []);
+  const cleanRentals = rentals.filter(r => !r.id.startsWith('rent-'));
+  setLocalItem(STORAGE_KEYS.RENTALS, cleanRentals);
 
   if (isSupabaseConfigured) {
     // Sync shops

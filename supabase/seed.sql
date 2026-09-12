@@ -67,27 +67,3 @@ INSERT INTO public.master_tools (name, category_name, description) VALUES
   ('Cooler', 'Washing & Cleaning', 'Industrial air cooler'),
   ('Soldering Iron', 'Welding & Electrical', 'Electric soldering station')
 ON CONFLICT (name) DO NOTHING;
-
--- 5. SEED CK TOOLS CUSTOMERS
-INSERT INTO public.customers (id, shop_id, name, phone, address, notes) VALUES
-  ('22222222-0001-4000-8000-000000000001', '55555555-0001-4000-8000-000000000001', 'Afsal', '9847123456', 'Panamaram, Wayanad', 'Regular electrician contractor'),
-  ('22222222-0002-4000-8000-000000000002', '55555555-0001-4000-8000-000000000001', 'Riyas', '9745987654', 'Kozhikode Town', 'House construction client')
-ON CONFLICT (shop_id, phone) DO NOTHING;
-
--- 6. SEED ABC TOOLS CUSTOMERS
-INSERT INTO public.customers (id, shop_id, name, phone, address, notes) VALUES
-  ('22222222-0003-4000-8000-000000000003', '55555555-0002-4000-8000-000000000002', 'Vikram Kumar', '9112233445', 'Mavoor Road, Calicut', 'Plumbing contractor')
-ON CONFLICT (shop_id, phone) DO NOTHING;
-
--- 7. SEED CK TOOLS PHYSICAL MACHINES
-INSERT INTO public.tools (id, shop_id, name, category_id, tool_code, condition, status) VALUES
-  ('33333333-0001-4000-8000-000000000001', '55555555-0001-4000-8000-000000000001', 'Driller', '11111111-0001-4000-8000-000000000001', 'DR-01', 'GOOD', 'AVAILABLE'),
-  ('33333333-0002-4000-8000-000000000002', '55555555-0001-4000-8000-000000000001', 'Driller', '11111111-0001-4000-8000-000000000001', 'DR-02', 'GOOD', 'AVAILABLE'),
-  ('33333333-0003-4000-8000-000000000003', '55555555-0001-4000-8000-000000000001', 'Cutter', '11111111-0002-4000-8000-000000000002', 'CUT-01', 'GOOD', 'AVAILABLE')
-ON CONFLICT (shop_id, tool_code) DO NOTHING;
-
--- 8. SEED ABC TOOLS PHYSICAL MACHINES
-INSERT INTO public.tools (id, shop_id, name, category_id, tool_code, condition, status) VALUES
-  ('33333333-0004-4000-8000-000000000004', '55555555-0002-4000-8000-000000000002', 'Drilling Machine', '11111111-0001-4000-8000-000000000001', 'DM-01', 'GOOD', 'AVAILABLE'),
-  ('33333333-0005-4000-8000-000000000005', '55555555-0002-4000-8000-000000000002', 'Water Pump', '11111111-0004-4000-8000-000000000004', 'WP-ABC-1', 'GOOD', 'AVAILABLE')
-ON CONFLICT (shop_id, tool_code) DO NOTHING;
