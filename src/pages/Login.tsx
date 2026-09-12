@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { ForgotPasswordModal } from '../components/auth/ForgotPasswordModal';
 import { AlertCircle } from 'lucide-react';
 
 export const Login: React.FC = () => {
@@ -9,7 +8,6 @@ export const Login: React.FC = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,18 +72,9 @@ export const Login: React.FC = () => {
           </div>
 
           <div>
-            <div className="flex items-center justify-between mb-1.5">
-              <label className="block text-xs font-extrabold text-[#20221f] uppercase">
-                Password
-              </label>
-              <button
-                type="button"
-                onClick={() => setIsForgotPasswordOpen(true)}
-                className="text-xs font-bold text-[#d35d2f] hover:underline"
-              >
-                Forgot Password?
-              </button>
-            </div>
+            <label className="block text-xs font-extrabold text-[#20221f] uppercase mb-1.5">
+              Password
+            </label>
             <input
               type="password"
               required
@@ -105,12 +94,6 @@ export const Login: React.FC = () => {
           </button>
         </form>
       </div>
-
-      {/* Forgot Password Modal */}
-      <ForgotPasswordModal
-        isOpen={isForgotPasswordOpen}
-        onClose={() => setIsForgotPasswordOpen(false)}
-      />
     </div>
   );
 };

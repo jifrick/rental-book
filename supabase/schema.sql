@@ -157,14 +157,14 @@ CREATE INDEX idx_settings_shop_id ON public.settings(shop_id);
 CREATE OR REPLACE FUNCTION public.get_auth_shop_id()
 RETURNS UUID AS $$
   SELECT shop_id FROM public.shop_users WHERE user_id = auth.uid() LIMIT 1;
-$$ LANGUAGE sql STABLE SECURITY DEFINER;
+$$ LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public;
 
 CREATE OR REPLACE FUNCTION public.is_platform_admin()
 RETURNS BOOLEAN AS $$
   SELECT EXISTS (
     SELECT 1 FROM public.shop_users WHERE user_id = auth.uid() AND role = 'platform_admin'
   );
-$$ LANGUAGE sql STABLE SECURITY DEFINER;
+$$ LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public;
 
 -- ROW LEVEL SECURITY POLICIES
 ALTER TABLE public.shops ENABLE ROW LEVEL SECURITY;
@@ -179,31 +179,51 @@ ALTER TABLE public.settings ENABLE ROW LEVEL SECURITY;
 
 -- Shops RLS
 CREATE POLICY "Shops tenant access" ON public.shops
-  FOR ALL USING (id = public.get_auth_shop_id() OR public.is_platform_admin());
+  FOR ALL
+  USING (id = public.get_auth_shop_id() OR public.is_platform_admin())
+  WITH CHECK (id = public.get_auth_shop_id() OR public.is_platform_admin());
 
 -- Shop Users RLS
 CREATE POLICY "Shop users self & admin access" ON public.shop_users
-  FOR ALL USING (user_id = auth.uid() OR public.is_platform_admin());
+  FOR ALL
+  USING (user_id = auth.uid() OR public.is_platform_admin())
+  WITH CHECK (user_id = auth.uid() OR public.is_platform_admin());
 
 -- Master Tools & Categories RLS
 CREATE POLICY "Master tools read" ON public.master_tools FOR SELECT USING (true);
-CREATE POLICY "Master tools admin edit" ON public.master_tools FOR ALL USING (public.is_platform_admin());
+CREATE POLICY "Master tools admin edit" ON public.master_tools
+  FOR ALL
+  USING (public.is_platform_admin())
+  WITH CHECK (public.is_platform_admin());
 
 CREATE POLICY "Categories read" ON public.categories FOR SELECT USING (true);
-CREATE POLICY "Categories admin edit" ON public.categories FOR ALL USING (public.is_platform_admin());
+CREATE POLICY "Categories admin edit" ON public.categories
+  FOR ALL
+  USING (public.is_platform_admin())
+  WITH CHECK (public.is_platform_admin());
 
 -- Shop-specific Business Tables RLS
 CREATE POLICY "Customers tenant isolation" ON public.customers
-  FOR ALL USING (shop_id = public.get_auth_shop_id() OR public.is_platform_admin());
+  FOR ALL
+  USING (shop_id = public.get_auth_shop_id() OR public.is_platform_admin())
+  WITH CHECK (shop_id = public.get_auth_shop_id() OR public.is_platform_admin());
 
 CREATE POLICY "Tools tenant isolation" ON public.tools
-  FOR ALL USING (shop_id = public.get_auth_shop_id() OR public.is_platform_admin());
+  FOR ALL
+  USING (shop_id = public.get_auth_shop_id() OR public.is_platform_admin())
+  WITH CHECK (shop_id = public.get_auth_shop_id() OR public.is_platform_admin());
 
 CREATE POLICY "Rentals tenant isolation" ON public.rentals
-  FOR ALL USING (shop_id = public.get_auth_shop_id() OR public.is_platform_admin());
+  FOR ALL
+  USING (shop_id = public.get_auth_shop_id() OR public.is_platform_admin())
+  WITH CHECK (shop_id = public.get_auth_shop_id() OR public.is_platform_admin());
 
 CREATE POLICY "Payments tenant isolation" ON public.payments
-  FOR ALL USING (shop_id = public.get_auth_shop_id() OR public.is_platform_admin());
+  FOR ALL
+  USING (shop_id = public.get_auth_shop_id() OR public.is_platform_admin())
+  WITH CHECK (shop_id = public.get_auth_shop_id() OR public.is_platform_admin());
 
 CREATE POLICY "Settings tenant isolation" ON public.settings
-  FOR ALL USING (shop_id = public.get_auth_shop_id() OR public.is_platform_admin());
+  FOR ALL
+  USING (shop_id = public.get_auth_shop_id() OR public.is_platform_admin())
+  WITH CHECK (shop_id = public.get_auth_shop_id() OR public.is_platform_admin());
