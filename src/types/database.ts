@@ -3,19 +3,29 @@ export type ToolStatus = 'AVAILABLE' | 'RENTED' | 'MAINTENANCE';
 export type RentalStatus = 'ACTIVE' | 'RETURNED' | 'OVERDUE' | 'CANCELLED';
 export type PaymentMethod = 'CASH' | 'UPI' | 'OTHER';
 export type PaymentStatus = 'PAID' | 'PARTIAL' | 'PENDING';
-export type UserRole = 'platform_admin' | 'shop_owner';
+export type UserRole = 'platform_admin' | 'shop_owner' | 'shop_staff';
 export type ShopStatus = 'ACTIVE' | 'SUSPENDED';
 
 export interface Shop {
   id: string;
   name: string;
   owner_name: string;
+  email: string;
   phone: string;
   address: string;
-  user_id_code: string; // e.g. CKTOOLS001, ABC001
   status: ShopStatus;
   is_onboarded: boolean;
   is_temp_password?: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ShopUser {
+  id: string;
+  user_id: string;
+  shop_id?: string;
+  role: UserRole;
+  email: string;
   created_at: string;
   updated_at: string;
 }
@@ -56,7 +66,7 @@ export interface Tool {
   name: string;
   category_id?: string;
   category_name?: string;
-  tool_code: string; // e.g. DR-01, CW-02
+  tool_code: string;
   description?: string;
   condition: ToolCondition;
   status: ToolStatus;
@@ -67,11 +77,10 @@ export interface Tool {
 export interface Rental {
   id: string;
   shop_id: string;
-  rental_code: string; // e.g. R-1001
+  rental_code: string;
   customer_id: string;
   tool_id: string;
   
-  // Joined fields for display convenience
   customer_name?: string;
   customer_phone?: string;
   customer_address?: string;

@@ -104,7 +104,7 @@ export const AdminOverview: React.FC<AdminOverviewProps> = ({ onNavigateToShops,
               <tr>
                 <th className="py-3 px-4">Shop Name</th>
                 <th className="py-3 px-4">Owner / Manager</th>
-                <th className="py-3 px-4">User ID Code</th>
+                <th className="py-3 px-4">Account Email</th>
                 <th className="py-3 px-4">Phone</th>
                 <th className="py-3 px-4">Status</th>
                 <th className="py-3 px-4">Onboarding</th>
@@ -115,7 +115,7 @@ export const AdminOverview: React.FC<AdminOverviewProps> = ({ onNavigateToShops,
                 <tr key={s.id} className="hover:bg-[#2e332a] transition-colors">
                   <td className="py-3.5 px-4 font-semibold text-white">{s.name}</td>
                   <td className="py-3.5 px-4 text-[#9da699]">{s.owner_name}</td>
-                  <td className="py-3.5 px-4 font-mono text-xs text-orange-400 font-semibold">{s.user_id_code}</td>
+                  <td className="py-3.5 px-4 font-mono text-xs text-orange-400 font-semibold">{s.email}</td>
                   <td className="py-3.5 px-4 text-[#9da699]">{s.phone}</td>
                   <td className="py-3.5 px-4">
                     <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${

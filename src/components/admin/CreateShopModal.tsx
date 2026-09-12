@@ -11,17 +11,17 @@ interface CreateShopModalProps {
 export const CreateShopModal: React.FC<CreateShopModalProps> = ({ onClose, onSuccess }) => {
   const [shopName, setShopName] = useState('');
   const [ownerName, setOwnerName] = useState('');
+  const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [address, setAddress] = useState('');
-  const [userIdCode, setUserIdCode] = useState('');
   const [tempPassword, setTempPassword] = useState('');
   const [useDefaultTools, setUseDefaultTools] = useState(true);
   const [error, setError] = useState('');
 
   const generateRandomPassword = () => {
-    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789!@#$';
     let pass = 'RB-';
-    for (let i = 0; i < 6; i++) {
+    for (let i = 0; i < 8; i++) {
       pass += chars.charAt(Math.floor(Math.random() * chars.length));
     }
     setTempPassword(pass);
@@ -29,10 +29,10 @@ export const CreateShopModal: React.FC<CreateShopModalProps> = ({ onClose, onSuc
 
   const handleShopNameChange = (val: string) => {
     setShopName(val);
-    if (!userIdCode || userIdCode === `${val.replace(/[^a-zA-Z0-9]/g, '').toUpperCase()}001`) {
-      const code = val.replace(/[^a-zA-Z0-9]/g, '').toUpperCase().substring(0, 7);
-      if (code) {
-        setUserIdCode(`${code}001`);
+    if (!email || email.includes('@example.com')) {
+      const slug = val.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+      if (slug) {
+        setEmail(`${slug}@example.com`);
       }
     }
   };
@@ -41,20 +41,20 @@ export const CreateShopModal: React.FC<CreateShopModalProps> = ({ onClose, onSuc
     e.preventDefault();
     setError('');
 
-    if (!shopName.trim() || !ownerName.trim() || !phone.trim() || !address.trim() || !userIdCode.trim()) {
+    if (!shopName.trim() || !ownerName.trim() || !email.trim() || !phone.trim() || !address.trim()) {
       setError('Please fill in all required fields.');
       return;
     }
 
-    const passToUse = tempPassword.trim() || 'RB-TEMP123';
+    const passToUse = tempPassword.trim() || 'RB-TEMP123!';
 
     try {
       const created = createShop({
         name: shopName,
         owner_name: ownerName,
+        email: email.trim().toLowerCase(),
         phone,
         address,
-        user_id_code: userIdCode,
         temp_password: passToUse,
         use_default_tools: useDefaultTools,
       });
@@ -76,7 +76,7 @@ export const CreateShopModal: React.FC<CreateShopModalProps> = ({ onClose, onSuc
             </div>
             <div>
               <h2 className="text-lg font-bold text-white">Create New Rental Shop Account</h2>
-              <p className="text-xs text-[#9da699]">Admin Provisioning • Set Shop & Owner Login Credentials</p>
+              <p className="text-xs text-[#9da699]">Admin Provisioning • Set Shop Owner Credentials</p>
             </div>
           </div>
           <button
@@ -126,6 +126,18 @@ export const CreateShopModal: React.FC<CreateShopModalProps> = ({ onClose, onSuc
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
             <div>
+              <label className="block text-xs text-[#9da699] font-medium mb-1">Owner Email Address *</label>
+              <input
+                type="email"
+                required
+                placeholder="e.g. cktools@example.com"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                className="w-full bg-[#232621] border border-[#32362e] rounded-xl px-3.5 py-2.5 text-white placeholder-[#687063] focus:outline-none focus:border-[#d35d2f] text-sm"
+              />
+            </div>
+
+            <div>
               <label className="block text-xs text-[#9da699] font-medium mb-1">Phone Number *</label>
               <input
                 type="text"
@@ -136,57 +148,43 @@ export const CreateShopModal: React.FC<CreateShopModalProps> = ({ onClose, onSuc
                 className="w-full bg-[#232621] border border-[#32362e] rounded-xl px-3.5 py-2.5 text-white placeholder-[#687063] focus:outline-none focus:border-[#d35d2f] text-sm"
               />
             </div>
+          </div>
 
-            <div>
-              <label className="block text-xs text-[#9da699] font-medium mb-1">Shop Address *</label>
-              <input
-                type="text"
-                required
-                placeholder="e.g. Koolimadu, Kozhikode"
-                value={address}
-                onChange={e => setAddress(e.target.value)}
-                className="w-full bg-[#232621] border border-[#32362e] rounded-xl px-3.5 py-2.5 text-white placeholder-[#687063] focus:outline-none focus:border-[#d35d2f] text-sm"
-              />
-            </div>
+          <div>
+            <label className="block text-xs text-[#9da699] font-medium mb-1">Shop Address *</label>
+            <input
+              type="text"
+              required
+              placeholder="e.g. Koolimadu, Kozhikode"
+              value={address}
+              onChange={e => setAddress(e.target.value)}
+              className="w-full bg-[#232621] border border-[#32362e] rounded-xl px-3.5 py-2.5 text-white placeholder-[#687063] focus:outline-none focus:border-[#d35d2f] text-sm"
+            />
           </div>
 
           <div className="text-xs font-bold text-[#d35d2f] uppercase tracking-wider pt-2">
-            2. Initial Login Credentials
+            2. Initial Login Password
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-            <div>
-              <label className="block text-xs text-[#9da699] font-medium mb-1">User ID *</label>
+          <div>
+            <label className="block text-xs text-[#9da699] font-medium mb-1">Temporary Password *</label>
+            <div className="flex gap-2">
               <input
                 type="text"
                 required
-                placeholder="e.g. CKTOOLS001"
-                value={userIdCode}
-                onChange={e => setUserIdCode(e.target.value.toUpperCase())}
-                className="w-full bg-[#232621] border border-[#32362e] rounded-xl px-3.5 py-2.5 font-mono text-white placeholder-[#687063] focus:outline-none focus:border-[#d35d2f] text-sm uppercase"
+                placeholder="Password"
+                value={tempPassword}
+                onChange={e => setTempPassword(e.target.value)}
+                className="w-full bg-[#232621] border border-[#32362e] rounded-xl px-3.5 py-2.5 font-mono text-white placeholder-[#687063] focus:outline-none focus:border-[#d35d2f] text-sm"
               />
-            </div>
-
-            <div>
-              <label className="block text-xs text-[#9da699] font-medium mb-1">Temporary Password *</label>
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  required
-                  placeholder="Password"
-                  value={tempPassword}
-                  onChange={e => setTempPassword(e.target.value)}
-                  className="w-full bg-[#232621] border border-[#32362e] rounded-xl px-3.5 py-2.5 font-mono text-white placeholder-[#687063] focus:outline-none focus:border-[#d35d2f] text-sm"
-                />
-                <button
-                  type="button"
-                  onClick={generateRandomPassword}
-                  className="px-3 bg-[#232621] hover:bg-[#2e332a] border border-[#32362e] text-[#9da699] hover:text-white rounded-xl flex items-center justify-center transition-colors shrink-0"
-                  title="Generate Password"
-                >
-                  <RefreshCw className="w-4 h-4" />
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={generateRandomPassword}
+                className="px-3 bg-[#232621] hover:bg-[#2e332a] border border-[#32362e] text-[#9da699] hover:text-white rounded-xl flex items-center justify-center transition-colors shrink-0"
+                title="Generate Password"
+              >
+                <RefreshCw className="w-4 h-4" />
+              </button>
             </div>
           </div>
 

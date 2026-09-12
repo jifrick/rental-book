@@ -126,8 +126,8 @@ const MainAppContent: React.FC = () => {
                   <span className="text-white font-bold">{createdShopInfo.shop.owner_name}</span>
                 </div>
                 <div>
-                  <span className="text-[#9da699]">User ID Code: </span>
-                  <span className="text-orange-400 font-bold">{createdShopInfo.shop.user_id_code}</span>
+                  <span className="text-[#9da699]">Owner Email: </span>
+                  <span className="text-orange-400 font-bold">{createdShopInfo.shop.email}</span>
                 </div>
                 <div>
                   <span className="text-[#9da699]">Temporary Password: </span>
@@ -138,7 +138,7 @@ const MainAppContent: React.FC = () => {
               <div className="flex gap-2">
                 <button
                   onClick={() => {
-                    const text = `Rental Book Credentials\nShop: ${createdShopInfo.shop.name}\nUser ID: ${createdShopInfo.shop.user_id_code}\nTemp Password: ${createdShopInfo.tempPass}`;
+                    const text = `Rental Book Credentials\nShop: ${createdShopInfo.shop.name}\nEmail: ${createdShopInfo.shop.email}\nTemp Password: ${createdShopInfo.tempPass}`;
                     navigator.clipboard.writeText(text);
                     setCopiedPass(true);
                     setTimeout(() => setCopiedPass(false), 2000);

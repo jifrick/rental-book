@@ -1,10 +1,10 @@
 -- Multi-Tenant SaaS Seed SQL for Rental Book
 
 -- 1. SEED SHOPS
-INSERT INTO public.shops (id, name, owner_name, phone, address, user_id_code, status, is_onboarded, is_temp_password) VALUES
-  ('55555555-0001-4000-8000-000000000001', 'CK TOOLS', 'JAMAL CK', '9946052379', 'Main Road, Koolimadu, Kozhikode Kerala', 'CKTOOLS001', 'ACTIVE', true, false),
-  ('55555555-0002-4000-8000-000000000002', 'ABC TOOLS', 'RAHUL SHARMA', '9895000111', 'Station Road, Calicut', 'ABC001', 'ACTIVE', true, false)
-ON CONFLICT (user_id_code) DO NOTHING;
+INSERT INTO public.shops (id, name, owner_name, email, phone, address, status, is_onboarded, is_temp_password) VALUES
+  ('55555555-0001-4000-8000-000000000001', 'CK TOOLS', 'JAMAL CK', 'cktools@example.com', '9946052379', 'Main Road, Koolimadu, Kozhikode Kerala', 'ACTIVE', true, false),
+  ('55555555-0002-4000-8000-000000000002', 'ABC TOOLS', 'RAHUL SHARMA', 'abctools@example.com', '9895000111', 'Station Road, Calicut', 'ACTIVE', true, false)
+ON CONFLICT (email) DO NOTHING;
 
 -- 2. SEED SHOP SETTINGS
 INSERT INTO public.settings (id, shop_id, shop_name, owner_name, phone, address) VALUES

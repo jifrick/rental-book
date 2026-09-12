@@ -33,7 +33,7 @@ export const ShopManagement: React.FC<ShopManagementProps> = ({ onCreateShopClic
   const filteredShops = shops.filter(s =>
     s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     s.owner_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    s.user_id_code.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    s.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
     s.phone.includes(searchQuery)
   );
 
@@ -62,7 +62,7 @@ export const ShopManagement: React.FC<ShopManagementProps> = ({ onCreateShopClic
           type="text"
           value={searchQuery}
           onChange={e => setSearchQuery(e.target.value)}
-          placeholder="Search by shop name, owner, user ID code (e.g. CKTOOLS001), or phone..."
+          placeholder="Search by shop name, owner name, email address, or phone..."
           className="w-full bg-[#232621] border border-[#32362e] rounded-xl pl-12 pr-4 py-3 text-white placeholder-[#687063] focus:outline-none focus:border-[#d35d2f] text-sm"
         />
       </div>
@@ -74,7 +74,7 @@ export const ShopManagement: React.FC<ShopManagementProps> = ({ onCreateShopClic
             <thead className="bg-[#191b18] text-[#9da699] text-xs font-semibold uppercase tracking-wider border-b border-[#32362e]">
               <tr>
                 <th className="py-3.5 px-4">Shop Details</th>
-                <th className="py-3.5 px-4">User ID Code</th>
+                <th className="py-3.5 px-4">Account Email</th>
                 <th className="py-3.5 px-4">Owner / Phone</th>
                 <th className="py-3.5 px-4">Address</th>
                 <th className="py-3.5 px-4">Status</th>
@@ -100,11 +100,11 @@ export const ShopManagement: React.FC<ShopManagementProps> = ({ onCreateShopClic
 
                   <td className="py-4 px-4 font-mono font-bold text-orange-400 text-sm">
                     <div className="flex items-center gap-2">
-                      <span>{s.user_id_code}</span>
+                      <span>{s.email}</span>
                       <button
-                        onClick={() => handleCopy(s.user_id_code, s.id)}
+                        onClick={() => handleCopy(s.email, s.id)}
                         className="text-[#9da699] hover:text-white transition-colors"
-                        title="Copy User ID Code"
+                        title="Copy Email"
                       >
                         {copiedId === s.id ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
                       </button>

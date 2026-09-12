@@ -88,23 +88,24 @@ export function getShopById(shopId: string): Shop | undefined {
   return getShops().find((s) => s.id === shopId);
 }
 
-export function getShopByUserIdCode(userIdCode: string): Shop | undefined {
-  return getShops().find((s) => s.user_id_code.trim().toUpperCase() === userIdCode.trim().toUpperCase());
+export function getShopByEmail(email: string): Shop | undefined {
+  return getShops().find((s) => s.email.trim().toLowerCase() === email.trim().toLowerCase());
 }
 
 export function createShop(data: {
   name: string;
   owner_name: string;
+  email: string;
   phone: string;
   address: string;
-  user_id_code: string;
   temp_password?: string;
   use_default_tools?: boolean;
 }): Shop {
   const shops = getShops();
-  const existingCode = shops.find(s => s.user_id_code.toUpperCase() === data.user_id_code.toUpperCase());
-  if (existingCode) {
-    throw new Error(`User ID "${data.user_id_code}" already exists.`);
+  const cleanEmail = data.email.trim().toLowerCase();
+  const existingEmail = shops.find(s => s.email.trim().toLowerCase() === cleanEmail);
+  if (existingEmail) {
+    throw new Error(`An account with email "${cleanEmail}" already exists.`);
   }
 
   const shopId = typeof crypto !== 'undefined' && crypto.randomUUID
@@ -115,9 +116,9 @@ export function createShop(data: {
     id: shopId,
     name: data.name.trim(),
     owner_name: data.owner_name.trim(),
+    email: cleanEmail,
     phone: data.phone.trim(),
     address: data.address.trim(),
-    user_id_code: data.user_id_code.trim().toUpperCase(),
     status: 'ACTIVE',
     is_onboarded: false,
     is_temp_password: true,
