@@ -179,31 +179,31 @@ ALTER TABLE public.settings ENABLE ROW LEVEL SECURITY;
 
 -- Shops RLS
 CREATE POLICY "Shops tenant access" ON public.shops
-  FOR ALL USING (id = public.get_auth_shop_id() OR public.is_platform_admin() OR auth.role() = 'anon');
+  FOR ALL USING (id = public.get_auth_shop_id() OR public.is_platform_admin());
 
 -- Shop Users RLS
 CREATE POLICY "Shop users self & admin access" ON public.shop_users
-  FOR ALL USING (user_id = auth.uid() OR public.is_platform_admin() OR auth.role() = 'anon');
+  FOR ALL USING (user_id = auth.uid() OR public.is_platform_admin());
 
 -- Master Tools & Categories RLS
 CREATE POLICY "Master tools read" ON public.master_tools FOR SELECT USING (true);
-CREATE POLICY "Master tools admin edit" ON public.master_tools FOR ALL USING (public.is_platform_admin() OR auth.role() = 'anon');
+CREATE POLICY "Master tools admin edit" ON public.master_tools FOR ALL USING (public.is_platform_admin());
 
 CREATE POLICY "Categories read" ON public.categories FOR SELECT USING (true);
-CREATE POLICY "Categories admin edit" ON public.categories FOR ALL USING (public.is_platform_admin() OR auth.role() = 'anon');
+CREATE POLICY "Categories admin edit" ON public.categories FOR ALL USING (public.is_platform_admin());
 
 -- Shop-specific Business Tables RLS
 CREATE POLICY "Customers tenant isolation" ON public.customers
-  FOR ALL USING (shop_id = public.get_auth_shop_id() OR public.is_platform_admin() OR auth.role() = 'anon');
+  FOR ALL USING (shop_id = public.get_auth_shop_id() OR public.is_platform_admin());
 
 CREATE POLICY "Tools tenant isolation" ON public.tools
-  FOR ALL USING (shop_id = public.get_auth_shop_id() OR public.is_platform_admin() OR auth.role() = 'anon');
+  FOR ALL USING (shop_id = public.get_auth_shop_id() OR public.is_platform_admin());
 
 CREATE POLICY "Rentals tenant isolation" ON public.rentals
-  FOR ALL USING (shop_id = public.get_auth_shop_id() OR public.is_platform_admin() OR auth.role() = 'anon');
+  FOR ALL USING (shop_id = public.get_auth_shop_id() OR public.is_platform_admin());
 
 CREATE POLICY "Payments tenant isolation" ON public.payments
-  FOR ALL USING (shop_id = public.get_auth_shop_id() OR public.is_platform_admin() OR auth.role() = 'anon');
+  FOR ALL USING (shop_id = public.get_auth_shop_id() OR public.is_platform_admin());
 
 CREATE POLICY "Settings tenant isolation" ON public.settings
-  FOR ALL USING (shop_id = public.get_auth_shop_id() OR public.is_platform_admin() OR auth.role() = 'anon');
+  FOR ALL USING (shop_id = public.get_auth_shop_id() OR public.is_platform_admin());

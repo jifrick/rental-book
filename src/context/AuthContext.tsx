@@ -173,7 +173,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         });
         return { success: true };
       } else {
-        return { success: false, error: 'Invalid password for Platform Admin.' };
+        return { success: false, error: 'Invalid email address or password.' };
       }
     }
 
