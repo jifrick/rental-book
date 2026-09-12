@@ -2,6 +2,7 @@ import React from 'react';
 import { History, Plus } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useShopSettings } from '../../hooks/useShopSettings';
+import { getShopById } from '../../lib/storageService';
 import { formatDateOnly } from '../../lib/dateUtils';
 
 interface HeaderProps {
@@ -10,9 +11,19 @@ interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = ({ onOpenNewRental, onOpenHistory }) => {
-  const { currentShopId } = useAuth();
+  const { currentShopId, role } = useAuth();
   const settings = useShopSettings(currentShopId);
+  const shop = getShopById(currentShopId);
+  const isSuspended = shop?.status === 'SUSPENDED' && role !== 'platform_admin';
   const currentDateStr = formatDateOnly(new Date());
+
+  const handleNewRentalClick = () => {
+    if (isSuspended) {
+      alert(`Shop "${shop?.name || 'Your shop'}" is currently SUSPENDED by Platform Admin. New rentals cannot be created.`);
+      return;
+    }
+    onOpenNewRental();
+  };
 
   return (
     <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-2">
@@ -38,9 +49,14 @@ export const Header: React.FC<HeaderProps> = ({ onOpenNewRental, onOpenHistory }
         )}
 
         <button
-          onClick={onOpenNewRental}
+          onClick={handleNewRentalClick}
           type="button"
-          className="inline-flex items-center justify-center gap-2 h-[46px] border-0 bg-[#d35d2f] hover:bg-[#c25227] text-white rounded-[11px] px-[17px] font-['Manrope'] font-extrabold text-sm shadow-[0_7px_20px_#d35d2f2b] transition-all active:scale-98"
+          disabled={isSuspended}
+          className={`inline-flex items-center justify-center gap-2 h-[46px] border-0 rounded-[11px] px-[17px] font-['Manrope'] font-extrabold text-sm transition-all active:scale-98 ${
+            isSuspended
+              ? 'bg-[#ded9d0] text-[#74766f] cursor-not-allowed shadow-none'
+              : 'bg-[#d35d2f] hover:bg-[#c25227] text-white shadow-[0_7px_20px_#d35d2f2b]'
+          }`}
         >
           <Plus className="w-5 h-5 stroke-[2.5]" />
           <span>＋ New Rental</span>

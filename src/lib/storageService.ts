@@ -81,7 +81,15 @@ initializeStorage();
 // ==========================================
 
 export function getShops(): Shop[] {
-  return getLocalItem<Shop[]>(STORAGE_KEYS.SHOPS, INITIAL_SHOPS);
+  const rawShops = getLocalItem<Shop[]>(STORAGE_KEYS.SHOPS, INITIAL_SHOPS);
+  return rawShops.map((s) => {
+    const seedMatch = INITIAL_SHOPS.find((init) => init.id === s.id);
+    return {
+      ...s,
+      email: s.email || seedMatch?.email || '',
+      status: s.status || seedMatch?.status || 'ACTIVE',
+    };
+  });
 }
 
 export function getShopById(shopId: string): Shop | undefined {
@@ -89,7 +97,9 @@ export function getShopById(shopId: string): Shop | undefined {
 }
 
 export function getShopByEmail(email: string): Shop | undefined {
-  return getShops().find((s) => s.email.trim().toLowerCase() === email.trim().toLowerCase());
+  if (!email) return undefined;
+  const cleanEmail = email.trim().toLowerCase();
+  return getShops().find((s) => (s.email || '').trim().toLowerCase() === cleanEmail);
 }
 
 export function createShop(data: {
@@ -102,8 +112,8 @@ export function createShop(data: {
   use_default_tools?: boolean;
 }): Shop {
   const shops = getShops();
-  const cleanEmail = data.email.trim().toLowerCase();
-  const existingEmail = shops.find(s => s.email.trim().toLowerCase() === cleanEmail);
+  const cleanEmail = (data.email || '').trim().toLowerCase();
+  const existingEmail = shops.find(s => (s.email || '').trim().toLowerCase() === cleanEmail);
   if (existingEmail) {
     throw new Error(`An account with email "${cleanEmail}" already exists.`);
   }
@@ -563,6 +573,11 @@ export function createRental(
   },
   shopId: string = DEFAULT_SHOP_ID
 ): Rental {
+  const shop = getShopById(shopId);
+  if (shop && shop.status === 'SUSPENDED') {
+    throw new Error(`Shop "${shop.name}" is currently SUSPENDED by Platform Admin. New rentals cannot be created.`);
+  }
+
   const customers = getCustomers(shopId);
   const tools = getTools(shopId);
 
