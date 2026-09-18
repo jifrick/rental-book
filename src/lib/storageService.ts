@@ -125,7 +125,7 @@ export function getShopByEmail(email: string): Shop | undefined {
   return match;
 }
 
-export function createShop(data: {
+export async function createShop(data: {
   name: string;
   owner_name: string;
   email: string;
@@ -133,7 +133,7 @@ export function createShop(data: {
   address: string;
   temp_password?: string;
   use_default_tools?: boolean;
-}): Shop {
+}): Promise<Shop> {
   const shops = getShops();
   const cleanEmail = (data.email || '').trim().toLowerCase();
   const existingEmail = shops.find(s => (s.email || '').trim().toLowerCase() === cleanEmail);
@@ -145,6 +145,8 @@ export function createShop(data: {
     ? crypto.randomUUID()
     : `55555555-${Date.now().toString().slice(-4)}-4000-8000-${Math.floor(Math.random()*1e12).toString().padStart(12, '0')}`;
 
+  const tempPass = data.temp_password ? data.temp_password.trim() : 'RB-TEMP123!';
+
   const newShop: Shop = {
     id: shopId,
     name: data.name.trim(),
@@ -155,6 +157,7 @@ export function createShop(data: {
     status: 'ACTIVE',
     is_onboarded: false,
     is_temp_password: true,
+    temp_password: tempPass,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   };
@@ -178,8 +181,26 @@ export function createShop(data: {
   setLocalItem(STORAGE_KEYS.SETTINGS, [newSetting, ...allSettings]);
 
   if (isSupabaseConfigured) {
-    Promise.resolve(supabase.from('shops').insert([newShop])).catch(console.error);
-    Promise.resolve(supabase.from('settings').insert([newSetting])).catch(console.error);
+    try {
+      await supabase.from('shops').insert([newShop]);
+      await supabase.from('settings').insert([newSetting]);
+
+      // Attempt Supabase Auth account creation
+      const { data: authData, error: authErr } = await supabase.auth.signUp({
+        email: cleanEmail,
+        password: tempPass,
+      });
+
+      if (!authErr && authData?.user) {
+        await supabase.from('shop_users').insert([{
+          user_id: authData.user.id,
+          shop_id: newShop.id,
+          role: 'shop_owner',
+        }]);
+      }
+    } catch (supaErr) {
+      console.warn('Supabase Auth user creation warning:', supaErr);
+    }
   }
 
   return newShop;

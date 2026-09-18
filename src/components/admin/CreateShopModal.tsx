@@ -37,7 +37,7 @@ export const CreateShopModal: React.FC<CreateShopModalProps> = ({ onClose, onSuc
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
@@ -49,7 +49,7 @@ export const CreateShopModal: React.FC<CreateShopModalProps> = ({ onClose, onSuc
     const passToUse = tempPassword.trim() || 'RB-TEMP123!';
 
     try {
-      const created = createShop({
+      const created = await createShop({
         name: shopName,
         owner_name: ownerName,
         email: email.trim().toLowerCase(),

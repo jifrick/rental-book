@@ -186,6 +186,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return { success: false, error: `Shop "${shop.name}" is currently suspended. Please contact platform admin.` };
     }
 
+    // Verify password length or exact temp_password
+    if (shop.is_temp_password && shop.temp_password) {
+      if (pass.trim() !== shop.temp_password.trim() && pass.length < 6) {
+        return { success: false, error: 'Invalid email address or password.' };
+      }
+    } else if (pass.length < 6) {
+      return { success: false, error: 'Invalid email address or password.' };
+    }
+
     saveSession({
       userId: `user-${shop.id}`,
       email: cleanEmail,

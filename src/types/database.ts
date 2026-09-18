@@ -16,6 +16,7 @@ export interface Shop {
   status: ShopStatus;
   is_onboarded: boolean;
   is_temp_password?: boolean;
+  temp_password?: string;
   created_at: string;
   updated_at: string;
 }
