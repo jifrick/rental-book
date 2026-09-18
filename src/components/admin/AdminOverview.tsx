@@ -1,6 +1,9 @@
-import React from 'react';
-import { Building2, CheckCircle2, AlertOctagon, Wrench, Users, Receipt, Plus } from 'lucide-react';
+import React, { useState } from 'react';
+import { Building2, CheckCircle2, AlertOctagon, Wrench, Users, Receipt, Plus, Pencil, Trash2 } from 'lucide-react';
 import { getShops, getMasterTools, getRentals, getCustomers } from '../../lib/storageService';
+import type { Shop } from '../../types/database';
+import { EditShopModal } from './EditShopModal';
+import { DeleteShopModal } from './DeleteShopModal';
 
 interface AdminOverviewProps {
   onNavigateToShops: () => void;
@@ -8,10 +11,16 @@ interface AdminOverviewProps {
 }
 
 export const AdminOverview: React.FC<AdminOverviewProps> = ({ onNavigateToShops, onCreateShopClick }) => {
-  const shops = getShops();
+  const [shops, setShops] = useState<Shop[]>(() => getShops());
   const masterTools = getMasterTools();
   const allRentals = getRentals();
   const allCustomers = getCustomers();
+  const [editingShop, setEditingShop] = useState<Shop | null>(null);
+  const [deletingShop, setDeletingShop] = useState<Shop | null>(null);
+
+  const refreshShops = () => {
+    setShops(getShops());
+  };
 
   const activeShopsCount = shops.filter(s => s.status === 'ACTIVE').length;
   const suspendedShopsCount = shops.filter(s => s.status === 'SUSPENDED').length;
@@ -108,6 +117,7 @@ export const AdminOverview: React.FC<AdminOverviewProps> = ({ onNavigateToShops,
                 <th className="py-3 px-4">Phone</th>
                 <th className="py-3 px-4">Status</th>
                 <th className="py-3 px-4">Onboarding</th>
+                <th className="py-3 px-4 text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[#32362e]">
@@ -134,12 +144,54 @@ export const AdminOverview: React.FC<AdminOverviewProps> = ({ onNavigateToShops,
                       <span className="text-amber-400 font-medium">Pending Onboarding</span>
                     )}
                   </td>
+                  <td className="py-3.5 px-4 text-right">
+                    <div className="flex items-center justify-end gap-2">
+                      <button
+                        onClick={() => setEditingShop(s)}
+                        className="p-1.5 bg-[#191b18] hover:bg-[#2e332a] border border-[#32362e] text-[#9da699] hover:text-white rounded-lg transition-colors"
+                        title="Edit Shop"
+                      >
+                        <Pencil className="w-3.5 h-3.5 text-amber-400" />
+                      </button>
+                      <button
+                        onClick={() => setDeletingShop(s)}
+                        className="p-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 rounded-lg transition-colors"
+                        title="Delete Shop"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
       </div>
+
+      {/* Edit Shop Modal */}
+      {editingShop && (
+        <EditShopModal
+          shop={editingShop}
+          onClose={() => setEditingShop(null)}
+          onSuccess={() => {
+            setEditingShop(null);
+            refreshShops();
+          }}
+        />
+      )}
+
+      {/* Delete Shop Modal */}
+      {deletingShop && (
+        <DeleteShopModal
+          shop={deletingShop}
+          onClose={() => setDeletingShop(null)}
+          onSuccess={() => {
+            setDeletingShop(null);
+            refreshShops();
+          }}
+        />
+      )}
     </div>
   );
 };

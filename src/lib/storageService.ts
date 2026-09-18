@@ -188,6 +188,96 @@ export function updateShopStatus(shopId: string, status: 'ACTIVE' | 'SUSPENDED')
   return updated;
 }
 
+export function updateShopDetails(
+  shopId: string,
+  data: {
+    name: string;
+    owner_name: string;
+    email: string;
+    phone: string;
+    address: string;
+  }
+): Shop {
+  const shops = getShops();
+  const index = shops.findIndex(s => s.id === shopId);
+  if (index === -1) throw new Error('Shop not found');
+
+  const cleanEmail = (data.email || '').trim().toLowerCase();
+  const existingEmail = shops.find(s => s.id !== shopId && (s.email || '').trim().toLowerCase() === cleanEmail);
+  if (existingEmail) {
+    throw new Error(`An account with email "${cleanEmail}" already exists for another shop.`);
+  }
+
+  const updated: Shop = {
+    ...shops[index],
+    name: data.name.trim(),
+    owner_name: data.owner_name.trim(),
+    email: cleanEmail,
+    phone: data.phone.trim(),
+    address: data.address.trim(),
+    updated_at: new Date().toISOString(),
+  };
+
+  shops[index] = updated;
+  setLocalItem(STORAGE_KEYS.SHOPS, shops);
+
+  // Sync to shop settings
+  const allSettings = getLocalItem<ShopSettings[]>(STORAGE_KEYS.SETTINGS, [INITIAL_SETTINGS]);
+  const settingIndex = allSettings.findIndex(s => s.shop_id === shopId);
+  if (settingIndex !== -1) {
+    allSettings[settingIndex] = {
+      ...allSettings[settingIndex],
+      shop_name: updated.name,
+      owner_name: updated.owner_name,
+      phone: updated.phone,
+      address: updated.address,
+      updated_at: updated.updated_at,
+    };
+    setLocalItem(STORAGE_KEYS.SETTINGS, allSettings);
+  }
+
+  if (isSupabaseConfigured) {
+    Promise.resolve(supabase.from('shops').update(updated).eq('id', shopId)).catch(console.error);
+    if (settingIndex !== -1) {
+      Promise.resolve(supabase.from('settings').update(allSettings[settingIndex]).eq('shop_id', shopId)).catch(console.error);
+    }
+  }
+
+  return updated;
+}
+
+export function deleteShop(shopId: string): void {
+  const shops = getShops();
+  const filteredShops = shops.filter(s => s.id !== shopId);
+  if (shops.length === filteredShops.length) throw new Error('Shop not found');
+
+  setLocalItem(STORAGE_KEYS.SHOPS, filteredShops);
+
+  // Purge settings for this shop
+  const allSettings = getLocalItem<ShopSettings[]>(STORAGE_KEYS.SETTINGS, [INITIAL_SETTINGS]);
+  setLocalItem(STORAGE_KEYS.SETTINGS, allSettings.filter(s => s.shop_id !== shopId));
+
+  // Purge tools for this shop
+  const allTools = getLocalItem<Tool[]>(STORAGE_KEYS.TOOLS, INITIAL_TOOLS);
+  setLocalItem(STORAGE_KEYS.TOOLS, allTools.filter(t => t.shop_id !== shopId));
+
+  // Purge customers for this shop
+  const allCustomers = getLocalItem<Customer[]>(STORAGE_KEYS.CUSTOMERS, INITIAL_CUSTOMERS);
+  setLocalItem(STORAGE_KEYS.CUSTOMERS, allCustomers.filter(c => c.shop_id !== shopId));
+
+  // Purge rentals for this shop
+  const allRentals = getLocalItem<Rental[]>(STORAGE_KEYS.RENTALS, INITIAL_RENTALS);
+  setLocalItem(STORAGE_KEYS.RENTALS, allRentals.filter(r => r.shop_id !== shopId));
+
+  if (isSupabaseConfigured) {
+    Promise.resolve(supabase.from('shops').delete().eq('id', shopId)).catch(console.error);
+    Promise.resolve(supabase.from('settings').delete().eq('shop_id', shopId)).catch(console.error);
+    Promise.resolve(supabase.from('tools').delete().eq('shop_id', shopId)).catch(console.error);
+    Promise.resolve(supabase.from('customers').delete().eq('shop_id', shopId)).catch(console.error);
+    Promise.resolve(supabase.from('rentals').delete().eq('shop_id', shopId)).catch(console.error);
+  }
+}
+
 export function markPasswordChanged(shopId: string) {
   const shops = getShops();
   const index = shops.findIndex(s => s.id === shopId);

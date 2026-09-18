@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { LogOut } from 'lucide-react';
 import type { ShopSettings } from '../types/database';
 import { updateSettings } from '../lib/storageService';
 import { useShopSettings } from '../hooks/useShopSettings';
 import { useAuth } from '../context/AuthContext';
 
 export const SettingsPage: React.FC = () => {
-  const { currentShopId } = useAuth();
+  const { currentShopId, logout } = useAuth();
   const currentSettings = useShopSettings(currentShopId);
   const [settings, setSettings] = useState<ShopSettings>(currentSettings);
   const [savedSuccess, setSavedSuccess] = useState(false);
@@ -98,6 +99,22 @@ export const SettingsPage: React.FC = () => {
           Save Settings
         </button>
       </form>
+
+      {/* Account Logout Card */}
+      <div className="bg-[#fdfcf9] border border-red-200 rounded-[18px] p-6 shadow-sm flex items-center justify-between">
+        <div>
+          <h3 className="font-bold text-sm text-[#20221f]">Account Logout</h3>
+          <p className="text-xs text-[#74766f]">Sign out of your shop workspace session</p>
+        </div>
+        <button
+          type="button"
+          onClick={logout}
+          className="px-4 py-2.5 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-[11px] font-extrabold text-xs flex items-center gap-1.5 transition-all cursor-pointer"
+        >
+          <LogOut className="w-4 h-4" />
+          <span>Logout</span>
+        </button>
+      </div>
     </div>
   );
 };

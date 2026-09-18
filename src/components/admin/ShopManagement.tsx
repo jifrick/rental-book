@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { Building2, Search, Plus, CheckCircle2, Ban, ExternalLink, Copy, Check } from 'lucide-react';
+import { Building2, Search, Plus, CheckCircle2, Ban, ExternalLink, Copy, Check, Pencil, Trash2 } from 'lucide-react';
 import { getShops, updateShopStatus } from '../../lib/storageService';
 import { useAuth } from '../../context/AuthContext';
 import type { Shop } from '../../types/database';
+import { EditShopModal } from './EditShopModal';
+import { DeleteShopModal } from './DeleteShopModal';
 
 interface ShopManagementProps {
   onCreateShopClick: () => void;
@@ -13,6 +15,8 @@ export const ShopManagement: React.FC<ShopManagementProps> = ({ onCreateShopClic
   const [searchQuery, setSearchQuery] = useState('');
   const { switchShop } = useAuth();
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [editingShop, setEditingShop] = useState<Shop | null>(null);
+  const [deletingShop, setDeletingShop] = useState<Shop | null>(null);
 
   const refreshShops = () => {
     setShops(getShops());
@@ -134,6 +138,15 @@ export const ShopManagement: React.FC<ShopManagementProps> = ({ onCreateShopClic
                   <td className="py-4 px-4 text-right">
                     <div className="flex items-center justify-end gap-2">
                       <button
+                        onClick={() => setEditingShop(s)}
+                        className="px-2.5 py-1.5 bg-[#191b18] hover:bg-[#2e332a] border border-[#32362e] text-[#9da699] hover:text-white rounded-lg text-xs font-semibold flex items-center gap-1 transition-colors"
+                        title="Edit Shop Details"
+                      >
+                        <Pencil className="w-3.5 h-3.5 text-amber-400" />
+                        <span>Edit</span>
+                      </button>
+
+                      <button
                         onClick={() => handleToggleStatus(s)}
                         className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
                           s.status === 'ACTIVE'
@@ -152,6 +165,14 @@ export const ShopManagement: React.FC<ShopManagementProps> = ({ onCreateShopClic
                         <ExternalLink className="w-3.5 h-3.5" />
                         <span>Inspect Shop</span>
                       </button>
+
+                      <button
+                        onClick={() => setDeletingShop(s)}
+                        className="p-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 rounded-lg transition-colors"
+                        title="Delete Shop"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
                     </div>
                   </td>
                 </tr>
@@ -160,6 +181,30 @@ export const ShopManagement: React.FC<ShopManagementProps> = ({ onCreateShopClic
           </table>
         </div>
       </div>
+
+      {/* Edit Shop Modal */}
+      {editingShop && (
+        <EditShopModal
+          shop={editingShop}
+          onClose={() => setEditingShop(null)}
+          onSuccess={() => {
+            setEditingShop(null);
+            refreshShops();
+          }}
+        />
+      )}
+
+      {/* Delete Shop Modal */}
+      {deletingShop && (
+        <DeleteShopModal
+          shop={deletingShop}
+          onClose={() => setDeletingShop(null)}
+          onSuccess={() => {
+            setDeletingShop(null);
+            refreshShops();
+          }}
+        />
+      )}
     </div>
   );
 };

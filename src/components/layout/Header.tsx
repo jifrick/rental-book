@@ -1,5 +1,5 @@
 import React from 'react';
-import { History, Plus } from 'lucide-react';
+import { History, Plus, LogOut } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useShopSettings } from '../../hooks/useShopSettings';
 import { getShopById } from '../../lib/storageService';
@@ -11,7 +11,7 @@ interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = ({ onOpenNewRental, onOpenHistory }) => {
-  const { currentShopId, role } = useAuth();
+  const { currentShopId, role, logout } = useAuth();
   const settings = useShopSettings(currentShopId);
   const shop = getShopById(currentShopId);
   const isSuspended = shop?.status === 'SUSPENDED' && role !== 'platform_admin';
@@ -27,16 +27,29 @@ export const Header: React.FC<HeaderProps> = ({ onOpenNewRental, onOpenHistory }
 
   return (
     <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-2">
-      <div>
-        <h1 className="font-['Manrope'] text-[24px] sm:text-[29px] font-extrabold tracking-[-1px] text-[#20221f] m-0">
-          Good day, <span className="text-[#d35d2f]">{settings.owner_name}</span>
-        </h1>
-        <div className="text-[#74766f] text-[13px] mt-[5px] font-medium">
-          {currentDateStr} · {settings.address}
+      <div className="flex items-center justify-between w-full sm:w-auto gap-3">
+        <div>
+          <h1 className="font-['Manrope'] text-[24px] sm:text-[29px] font-extrabold tracking-[-1px] text-[#20221f] m-0">
+            Good day, <span className="text-[#d35d2f]">{settings.owner_name}</span>
+          </h1>
+          <div className="text-[#74766f] text-[13px] mt-[5px] font-medium">
+            {currentDateStr} · {settings.address}
+          </div>
         </div>
+
+        {/* Mobile Logout Button */}
+        <button
+          onClick={logout}
+          type="button"
+          title="Logout"
+          className="md:hidden flex items-center gap-1.5 h-[38px] border border-[#ded9d0] bg-[#fdfcf9] hover:bg-red-50 text-red-600 rounded-[10px] px-3 font-extrabold text-xs transition-all shrink-0 active:scale-95 shadow-xs"
+        >
+          <LogOut className="w-3.5 h-3.5" />
+          <span>Logout</span>
+        </button>
       </div>
 
-      <div className="flex items-center gap-[9px] self-end sm:self-auto shrink-0">
+      <div className="flex items-center gap-[9px] self-end sm:self-auto shrink-0 w-full sm:w-auto justify-end">
         {onOpenHistory && (
           <button
             onClick={onOpenHistory}
