@@ -109,7 +109,20 @@ export function getShopById(shopId: string): Shop | undefined {
 export function getShopByEmail(email: string): Shop | undefined {
   if (!email) return undefined;
   const cleanEmail = email.trim().toLowerCase();
-  return getShops().find((s) => (s.email || '').trim().toLowerCase() === cleanEmail);
+  const shops = getShops();
+  let match = shops.find((s) => (s.email || '').trim().toLowerCase() === cleanEmail);
+  if (!match) {
+    // Alias fallback check (e.g. cktools@rentalbook.com <-> cktools@example.com)
+    const altEmail = cleanEmail.endsWith('@rentalbook.com')
+      ? cleanEmail.replace('@rentalbook.com', '@example.com')
+      : cleanEmail.endsWith('@example.com')
+      ? cleanEmail.replace('@example.com', '@rentalbook.com')
+      : null;
+    if (altEmail) {
+      match = shops.find((s) => (s.email || '').trim().toLowerCase() === altEmail);
+    }
+  }
+  return match;
 }
 
 export function createShop(data: {

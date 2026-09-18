@@ -29,10 +29,10 @@ export const CreateShopModal: React.FC<CreateShopModalProps> = ({ onClose, onSuc
 
   const handleShopNameChange = (val: string) => {
     setShopName(val);
-    if (!email || email.includes('@example.com')) {
+    if (!email || email.includes('@example.com') || email.includes('@rentalbook.com')) {
       const slug = val.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
       if (slug) {
-        setEmail(`${slug}@example.com`);
+        setEmail(`${slug}@rentalbook.com`);
       }
     }
   };
